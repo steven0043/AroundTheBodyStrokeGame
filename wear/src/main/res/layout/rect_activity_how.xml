@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:orientation="vertical"
+    tools:context="com.atbsg.stroke.aroundthebodystrokegame.how.HowActivity"
+    tools:deviceIds="wear_square"
+    android:background="#313c9a">
+
+    <TextView android:id="@+id/text" android:layout_width="wrap_content"
+        android:layout_height="wrap_content" android:text="To play this game, strap the watch firmly on your wrist and follow the directions on screen"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:gravity="center"
+        android:fontFamily="sans-serif-condensed-light"
+        android:lineSpacingExtra="-4sp"
+        android:textColor="@color/text_color"
+        android:textSize="16sp"/>
+</RelativeLayout>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:orientation="vertical"
+    tools:context="com.atbsg.stroke.aroundthebodystrokegame.games.GyroscopeActivity"
+    tools:deviceIds="wear_square"
+    android:background="#313c9a">
+
+    <TextView android:id="@+id/text" android:layout_width="wrap_content"
+        android:layout_height="wrap_content" android:text="@string/hello_square" />
+
+    <ProgressBar
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/progressBar"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:max="10"
+        android:progress="0"/>
+</RelativeLayout>
