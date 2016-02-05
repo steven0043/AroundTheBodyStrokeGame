@@ -70,7 +70,7 @@ public class GameScreen implements Screen {
         bricks.y = MathUtils.random(0, 1000);
         bricks.width = 70;
         bricks.height = 20;
-        brickArray.add(bricks);//fdsf
+        brickArray.add(bricks);
         lastDropTime = TimeUtils.nanoTime();
 
     }
@@ -93,7 +93,7 @@ public class GameScreen implements Screen {
 
         circleRec.y=(game.actionResolver.getVertical()/2);
 
-        if(/*circleRec.y <0 || */circleRec.y > 9999){
+        if(/*circleRec.y <0 || */circleRec.y == 1000){
             score = score + 1;
             scoreSound.play(1);
             updateBool = true;
@@ -101,7 +101,7 @@ public class GameScreen implements Screen {
             game.actionResolver.setVertical(20);
             if(score > getNormScore()){
                 setNormScore(score);
-            }
+            }//f
         }
 
         Iterator<Rectangle> iter = brickArray.iterator();
