@@ -70,7 +70,7 @@ public class GameScreen implements Screen {
         bricks.y = MathUtils.random(0, 1000);
         bricks.width = 70;
         bricks.height = 20;
-        brickArray.add(bricks);
+        brickArray.add(bricks);//fdsf
         lastDropTime = TimeUtils.nanoTime();
 
     }
