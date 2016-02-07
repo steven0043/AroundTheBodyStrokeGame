@@ -2,6 +2,7 @@ package com.atbsg.atbsg;
 
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 
 import com.badlogic.gdx.Gdx;
@@ -25,25 +26,21 @@ public class GameScreen implements Screen {
     int score, hs;
     SpriteBatch batch;
     Texture circle, holeCircle200, holeCircle150, holeCircle100, holeCircle75, home, cloudImage, snowImage, brickImage;
-    int changeY, yCord, xCord, theCounter, img, r, g, b;
+    ArrayList<String> gameDirections = new ArrayList<String>(Arrays.asList("UP", "DOWN", "RIGHT", "LEFT"));
+    int changeY, r, g, b ,counter;
     Sound fireSound, scoreSound;
-    boolean fire = false;
     boolean updateBool = false;
-    boolean changeRecBool = false;
     boolean right = true;
     boolean left = false;
     BitmapFont font;
     Preferences prefs;
-    ArrayList<Rectangle> holeArray;
     ArrayList<Texture> circleArray;
-    ArrayList<Rectangle> cloudArray;
-    ArrayList<Rectangle> snowArray;
     Array<Rectangle> brickArray;
-    int recKeeper[] = new int[] {200, 150, 100, 75};
     Rectangle circleRec;
-    long yTime,xTime, lastDropTime;
+    long lastDropTime;
 
     public GameScreen(final ATBSG gam) {
+        createRecs();
         game = gam;
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 610, 1080);
@@ -58,9 +55,9 @@ public class GameScreen implements Screen {
         g = 60;
         b = 154;
         brickImage = new Texture(Gdx.files.internal("brick.png"));
+        circle = new Texture(Gdx.files.internal("circle.png"));
         changeY = 1;
         brickArray = new Array<Rectangle>();
-        createRecs();
         spawnBricks();
     }
 
@@ -91,9 +88,22 @@ public class GameScreen implements Screen {
         game.batch.draw(circle, circleRec.x, circleRec.y);
         game.batch.end();
 
-        circleRec.y=(game.actionResolver.getVertical()/2);
 
-        if(/*circleRec.y <0 || */circleRec.y == 1000){
+        if(gameDirections.get(counter).equals("UP") || gameDirections.get(counter).equals("DOWN")) {
+            circleRec.y=(game.actionResolver.getVertical()/2);
+        }
+        else {
+            circleRec.y = 500;
+        }
+
+        if(gameDirections.get(counter).equals("LEFT") || gameDirections.get(counter).equals("RIGHT")) {
+            circleRec.x = (game.actionResolver.getHorizontal());
+        }
+        else {
+            circleRec.x = 300;
+        }
+
+        if(circleRec.y <=0 || circleRec.y >= 1000){
             score = score + 1;
             scoreSound.play(1);
             updateBool = true;
@@ -101,7 +111,12 @@ public class GameScreen implements Screen {
             game.actionResolver.setVertical(20);
             if(score > getNormScore()){
                 setNormScore(score);
-            }//f
+            }
+            if(counter == 3){
+                counter = -1;
+            }
+            counter++;
+            game.actionResolver.sendToPhone(gameDirections.get(counter));
         }
 
         Iterator<Rectangle> iter = brickArray.iterator();
@@ -123,9 +138,11 @@ public class GameScreen implements Screen {
     }
 
     public void startAgain(){
+        counter = 0;
         score = 0;
-        circleRec.y = 20;
+        //circleRec.y = 20;
         game.actionResolver.setVertical(20);
+        game.actionResolver.sendToPhone("reset");
         if(score > getNormScore()){
             setNormScore(score);
         }

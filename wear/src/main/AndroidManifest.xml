@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.atbsg.atbsg" >
+
     <uses-feature android:name="android.hardware.type.watch" />
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
-
     <application
-        android:allowBackup="true"
         android:name=".how.MyApplication"
+        android:allowBackup="true"
         android:icon="@mipmap/nhs"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@android:style/Theme.DeviceDefault" >
-
-        <meta-data android:name="com.google.android.gms.version"
+        <meta-data
+            android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
         <uses-library
@@ -44,7 +44,7 @@
             android:name=".games.SensorActivity"
             android:label="@string/app_name"
             android:launchMode="singleInstance"
-            android:noHistory="true">
+            android:noHistory="true" >
         </activity>
         <activity
             android:name=".menu.SensorMenuActivity"
@@ -60,9 +60,26 @@
         </activity>
         <activity
             android:name=".games.CalibrationActivity"
-            android:label="@string/title_activity_calibration">
+            android:label="@string/title_activity_calibration" >
         </activity>
+
         <service android:name=".menu.VoiceService" />
+        <service android:name=".logging.ListenerService" >
+            <intent-filter>
+                <action android:name="com.google.android.gms.wearable.BIND_LISTENER" />
+            </intent-filter>
+        </service>
+
+        <activity
+            android:name=".games.PhoneGameActivity"
+            android:label="@string/title_activity_phone_game"
+            android:theme="@android:style/Theme.DeviceDefault.Light" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

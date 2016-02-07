@@ -1,5 +1,6 @@
 package com.atbsg.atbsg;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -32,7 +33,8 @@ public class MainActivity extends AppCompatActivity{
     public static String currentMode = "";
     int verticalMax = 2000;
     private static Logger logger;
-    public AndroidLauncher game = new AndroidLauncher();
+    public static AndroidLauncher game = new AndroidLauncher();
+    static Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +44,7 @@ public class MainActivity extends AppCompatActivity{
         setSupportActionBar(toolbar);*/
         System.out.println("On Create!!");
         logger = new Logger(this);
+        mContext = this;
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         try {
@@ -166,8 +169,7 @@ public class MainActivity extends AppCompatActivity{
         }
 
         if(id==R.id.game){
-            Intent intent = new Intent(this, game.getClass());
-            startActivity(intent);
+            playGame();
         }
 
         return super.onOptionsItemSelected(item);
@@ -175,6 +177,11 @@ public class MainActivity extends AppCompatActivity{
 
     public void onPause(){
         super.onPause();
+    }
+
+    public static void playGame(){
+        Intent intent = new Intent(mContext, game.getClass());
+        mContext.startActivity(intent);
     }
 
     public static void speak(String speech){

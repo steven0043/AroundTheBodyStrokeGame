@@ -5,22 +5,28 @@ import android.view.WindowManager;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
-import com.atbsg.atbsg.ATBSG;
 
 public class AndroidLauncher extends AndroidApplication implements ActionResolver {
-	static int up;
+	static int vertical, horizontal;
+	CloudLogger cloudLogger;
 
 	public AndroidLauncher(){
 
 	}
 
-	protected static void updateUp(int mProgressStatus){
-		up = mProgressStatus;
+	protected static void updateVertical(int mProgressStatus){
+		vertical = mProgressStatus;
+	}
+
+	protected static void updateHorizontal(int mProgressStatus){
+		horizontal = mProgressStatus;
 	}
 
 	@Override
 	protected void onCreate (Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		cloudLogger = new CloudLogger(this);
+		cloudLogger.initApi();
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
 		initialize(new ATBSG(this), config);
@@ -28,16 +34,21 @@ public class AndroidLauncher extends AndroidApplication implements ActionResolve
 
 	@Override
 	public int getVertical() {
-		return up+1;
+		return vertical;
 	}
 
 	@Override
 	public int getHorizontal() {
-		return 340;
+		return horizontal;
 	}
 
 	@Override
 	public void setVertical(int vertical) {
-		up=vertical;
+		AndroidLauncher.vertical=vertical;
+	}
+
+	@Override
+	public void sendToPhone(String message) {
+		cloudLogger.sendScoreToCloud(message);
 	}
 }

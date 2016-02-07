@@ -4,16 +4,12 @@ package com.atbsg.atbsg;
  * Created by Steven on 25/01/2016.
  */
 
-import android.media.MediaPlayer;
-import android.speech.tts.TextToSpeech;
-
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.WearableListenerService;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Date;
-import java.util.Locale;
 
 
 public class ListenerService extends WearableListenerService {
@@ -28,7 +24,7 @@ public class ListenerService extends WearableListenerService {
     @Override
     public void onMessageReceived(MessageEvent messageEvent) {
         try {
-            System.out.println("Called" );
+            System.out.println("Called" + messageEvent.getPath() );
             String direction = "";
             int progress = 0;
             addScore(messageEvent.getPath());
@@ -38,11 +34,19 @@ public class ListenerService extends WearableListenerService {
                 String score = direction.replaceAll("\\D+","");
                 direction = direction.replaceAll("\\d","");
                 MainActivity.updateProgressBar(direction, score, progress);
-                AndroidLauncher.updateUp(progress);
+                if(isDirectionVertical(direction)) {
+                    AndroidLauncher.updateVertical(progress);
+                }else{
+                    AndroidLauncher.updateHorizontal(progress);
+                }
             }
             else if (!scoreAdded && messageEvent.getPath().startsWith("2")) {
                 System.out.println("MODE " + messageEvent.getPath());
                 String gameMode = messageEvent.getPath().substring(1);
+                if(gameMode.equals("game")){
+                    System.out.println("LAUNCHING");
+                    MainActivity.playGame();
+                }
                 if(gameMode.equals("EASY")){
                     MainActivity.setMaximums(gameMode, 500, 2000);
                 }
@@ -123,8 +127,8 @@ public class ListenerService extends WearableListenerService {
         }
     }
 
-    private boolean isDirection(String message){
-        if(message.equals("UP") || message.equals("DOWN") || message.equals("RIGHT") || message.equals("LEFT") ){
+    private boolean isDirectionVertical(String message){
+        if(message.equals("UP") || message.equals("DOWN")){
             return true;
         }else{
             return false;

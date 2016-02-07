@@ -1,5 +1,4 @@
-package com.atbsg.atbsg.logging;
-
+package com.atbsg.atbsg;
 
 import android.content.Context;
 
@@ -8,13 +7,6 @@ import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutput;
-import java.io.ObjectOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.List;
@@ -72,25 +64,8 @@ public class CloudLogger {
     }
 
     public void playStartMessages(){
-        if(contextClass.equals("MenuActivity")){
-           // sendScoreToCloud("Welcome to the around the body stroke recovery game. Your starting " +
-                    //"options are: how to play, game modes, my progress and settings");
-        }
-        if(contextClass.equals("CalibrationActivity")){
-            sendScoreToCloud("Before we start, look straight ahead. Then please make sure the watch face is parallel to your own face");
-        }
-        if(contextClass.equals("HowActivity")){
-           /* sendScoreToCloud("To play this game, strap the watch firmly on your wrist and follow the directions on screen. You can swipe right to move back a screen.");*/
-        }
-        if(contextClass.equals("SensorActivity")){
-            //sendScoreToCloud("2game");
-            sendScoreToCloud("Please move your arm up!");
-        }
-        if(contextClass.equals("{PhoneGameActivity")){
-            sendScoreToCloud("2game");
-        }
+        //sendScoreToCloud("Hello from phone!");
     }
-
     /**
      * Sends a message to the connected mobile device
      */
@@ -108,39 +83,8 @@ public class CloudLogger {
             }).start();
         }
     }
-
-    public void sendProgressToPhone(final String direction, int progress) {
-        //System.out.println("SENDING PROGRESS null");
-        final byte[] progressByte = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(progress).array();
-        if (nodeId != null) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    //System.out.println("SENDING PROGRESS");
-                    client.blockingConnect(CONNECTION_TIME_OUT_MS, TimeUnit.MILLISECONDS);
-                    Wearable.MessageApi.sendMessage(client, nodeId, direction, progressByte);
-                    client.disconnect();
-                }
-            }).start();
-        }
-    }
-
     public boolean isConnected(){
         return connected;
     }
 
-    private byte[] convertToBytes(Object object) throws IOException {
-        try (ByteArrayOutputStream bos = new ByteArrayOutputStream();
-             ObjectOutput out = new ObjectOutputStream(bos)) {
-            out.writeObject(object);
-            return bos.toByteArray();
-        }
-    }
-
-    private Object convertFromBytes(byte[] bytes) throws IOException, ClassNotFoundException {
-        try (ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
-             ObjectInput in = new ObjectInputStream(bis)) {
-            return in.readObject();
-        }
-    }
 }

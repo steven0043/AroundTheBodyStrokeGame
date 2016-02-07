@@ -25,6 +25,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import com.atbsg.atbsg.R;
 import com.atbsg.atbsg.games.CalibrationActivity;
+import com.atbsg.atbsg.games.PhoneGameActivity;
 import com.atbsg.atbsg.games.SensorActivity;
 import com.atbsg.atbsg.how.HowActivity;
 import com.atbsg.atbsg.logging.CloudLogger;
@@ -40,7 +41,7 @@ public class MenuActivity extends Activity implements WearableListView.ClickList
 
     private ListView lv;
     List<String> menu_list = new ArrayList<String>(Arrays.asList("How To Play", "Game Modes", "My Progress", "Sensor Data"));
-    String[] elements = {"How To Play", "Game Modes", "My Progress", "Settings", "Sensor Data"};
+    String[] elements = {"How To Play", "Game Modes", "My Progress", "Settings", "Sensor Data", "Play Game"};
     public static Logger logger;
     private static final String START_SPEECH = "Welcome to the around the body stroke recovery game. Your starting " +
             "options are: how to play, game modes, my progress and settings";
@@ -160,6 +161,11 @@ public class MenuActivity extends Activity implements WearableListView.ClickList
         startActivity(i);
     }
 
+    public void startPhoneGameActivity() {
+        Intent i = new Intent(this, PhoneGameActivity.class);
+        startActivity(i);
+    }
+
     public void speakOnPhone(String speech){
         cloudLogger.sendScoreToCloud(speech);
     }
@@ -194,7 +200,7 @@ public class MenuActivity extends Activity implements WearableListView.ClickList
                 startSensorActivity();
             }
             if (tag == 5) {
-                listenOut();
+                startGameModeActivity(500, 2000);
             }
         }
         if(gameMenu && !scoreMenu) {
