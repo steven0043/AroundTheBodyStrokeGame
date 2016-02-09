@@ -113,6 +113,26 @@ public class DirectionHelper {
         } else {
             return false;
         }
+    /*    if (history.size() > 10) {
+            List<Double> subList = history.subList(0, 9);
+            history = subList;
+        }
+        //double sum = 0;
+        if (!history.isEmpty()) {
+            for (Double mark : history) {
+                sum += mark;
+            }
+            sum = sum / history.size();
+            if(sum>highestLeftRightAverage){
+                highestLeftRightAverage = sum;
+            }
+            System.out.println("RIGHT SUM " + sum);
+        }
+        if (sum < -0.005) {
+            return true;
+        } else {
+            return false;
+        }*/
     }
     public void addToHistory(double currentValue){
         history.add(currentValue);

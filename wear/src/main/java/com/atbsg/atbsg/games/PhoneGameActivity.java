@@ -61,4 +61,11 @@ public class PhoneGameActivity extends WearableActivity {
     private void updateDisplay() {
 
     }
+
+    @Override
+    protected void onDestroy() {
+        sensorListener.unregister();
+        finish();
+        super.onDestroy();
+    }
 }

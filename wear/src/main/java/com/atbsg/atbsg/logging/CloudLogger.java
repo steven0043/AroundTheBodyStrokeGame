@@ -86,7 +86,7 @@ public class CloudLogger {
             //sendScoreToCloud("2game");
             sendScoreToCloud("Please move your arm up!");
         }
-        if(contextClass.equals("{PhoneGameActivity")){
+        if(contextClass.equals("PhoneGameActivity")){
             sendScoreToCloud("2game");
         }
     }

@@ -27,6 +27,8 @@ public class PhoneGameListener implements SensorEventListener {
     int horizontalMax = 500;
     int verticalMax = 2000;
     public static String currentPhoneMotion = "UP";
+    float [] history = new float[2];
+    String [] direction = {"NONE","NONE"};
 
     public PhoneGameListener(SensorManager sm, PhoneGameActivity currentActivity){
         this.currentActivity = currentActivity;
@@ -39,6 +41,13 @@ public class PhoneGameListener implements SensorEventListener {
     public void onSensorChanged(SensorEvent event) {
 
         long curTime = System.currentTimeMillis();
+
+        /*float xChange = history[0] - event.values[0];
+        float yChange = history[1] - event.values[1];
+
+        history[0] = event.values[0];
+        history[1] = event.values[1];*/
+
         if((curTime - lastUpdate) > 10) {
 
             // Isolate the force of gravity with the low-pass filter.
@@ -69,6 +78,18 @@ public class PhoneGameListener implements SensorEventListener {
                     mProgressStatus = (int) (mProgressStatus - -(-linear_acceleration[2]*3) * (gameHelper.getDownAverage()*(24-((gameHelper.getHighestUpDownAverage()+1)*4))));
                 }
             }
+            /*else if (xChange > 0.1 && currentPhoneMotion.equals("RIGHT") && gameHelper.goingRight()){
+                if(mProgressStatus < horizontalMax && mProgressStatus >= 0) {
+                    //System.out.println(" GOING RIGHT!! \n +" + (toPositive(linear_acceleration[0]*3) * (toPositive(gameHelper.getRightAverage())*(24-((toPositive(gameHelper.getHighestLeftRightAverage())+1)*4)))));
+                    //mProgressStatus = (int) ((mProgressStatus) + (((-gameHelper.getRightAverage())+1)*24) * ((gameHelper.getHighestLeftRightAverage())+1));
+                    mProgressStatus = (int) (mProgressStatus + -(-xChange*3) * ((gameHelper.getRightAverage()+3)*(24-((gameHelper.getHighestLeftRightAverage()+4)*4))));
+                }
+            }*/
+          /*  else if (xChange < -0.05 && currentPhoneMotion.equals("LEFT")){
+                if(mProgressStatus > 0 && mProgressStatus <= 500) {
+                    mProgressStatus = (int) ((mProgressStatus-1) - ((gameHelper.getHighestLeftRightAverage()+1)*20));
+                }
+            }*/
             else if(linear_acceleration[0] < -0.005 && currentPhoneMotion.equals("RIGHT")
                     && gameHelper.goingRight()){
                 if(mProgressStatus < horizontalMax && mProgressStatus >= 0) {
@@ -86,8 +107,8 @@ public class PhoneGameListener implements SensorEventListener {
                     mProgressStatus = (int) (mProgressStatus - -(-linear_acceleration[0]*5) * (gameHelper.getLeftAverage()*(60-(((-gameHelper.getHighestLeftRightAverage())+3)*4))));
                 }
             }
-            currentActivity.sendToPhone("10"+currentPhoneMotion, mProgressStatus);
-            System.out.println("Progress " + mProgressStatus);
+
+            currentActivity.sendToPhone("30"+currentPhoneMotion, mProgressStatus);
             lastUpdate = curTime;
         }
     }
@@ -100,6 +121,7 @@ public class PhoneGameListener implements SensorEventListener {
 
     public static void setPhoneDirection(String direction){
         currentPhoneMotion = direction;
+        reset();
     }
 
     public static void reset(){
@@ -117,6 +139,8 @@ public class PhoneGameListener implements SensorEventListener {
     public void unregister() {
         //playSound("Your final score is " + score);
         System.out.println("DESTROOOYYYEDD");
+        mProgressStatus = 0;
+        currentPhoneMotion = "UP";
         mSensorManager.unregisterListener(this);
         mSensorManager.unregisterListener(this, mAccelerometer);
         mSensorManager.flush(this);

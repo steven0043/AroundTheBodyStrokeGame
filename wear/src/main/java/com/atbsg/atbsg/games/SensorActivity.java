@@ -1,5 +1,6 @@
 package com.atbsg.atbsg.games;
 
+import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.hardware.SensorManager;
 import android.os.Bundle;
@@ -70,7 +71,7 @@ public class SensorActivity extends WearableActivity  {
         });
         runOnUiThread(new Runnable() {
             public void run() {
-                sensorListener = new SensorListener((SensorManager) getSystemService(SENSOR_SERVICE), SensorActivity.this, horizontalMax, verticalMax);
+                sensorListener = new SensorListener((SensorManager) getSystemService(Context.SENSOR_SERVICE), SensorActivity.this, horizontalMax, verticalMax);
             }
         });
     }

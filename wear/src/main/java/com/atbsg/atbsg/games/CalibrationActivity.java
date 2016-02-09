@@ -1,6 +1,7 @@
 package com.atbsg.atbsg.games;
 
 
+import android.content.Context;
 import android.content.Intent;
 import android.hardware.SensorManager;
 import android.os.Bundle;
@@ -57,7 +58,7 @@ public class CalibrationActivity extends WearableActivity {
 
             }
         });
-        sensorListener = new CalibrationListener((SensorManager)getSystemService(SENSOR_SERVICE), this);
+        sensorListener = new CalibrationListener((SensorManager)getSystemService(Context.SENSOR_SERVICE), this);
     }
 
     protected void setmTextView(String text) {

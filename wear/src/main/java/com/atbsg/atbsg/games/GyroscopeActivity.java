@@ -1,5 +1,6 @@
 package com.atbsg.atbsg.games;
 
+import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -22,22 +23,11 @@ public class GyroscopeActivity extends WearableActivity implements SensorEventLi
     public Sensor mAccelerometer;
     boolean textBool = false;
     private long lastUpdate = 0;
-    private double[] gravity ={0,0,0};
-    String direction = "";
-    private double[] linear_acceleration ={0,0,0};
-    float [] history = new float[3];
-    // Create a constant to convert nanoseconds to seconds.
-    private static final float NS2S = 1.0f / 1000000000.0f;
-    private final float[] deltaRotationVector = new float[4];
-    private float timestamp;
-    private final float[] rotationCurrent = new float[4];
-    private static final int PROGRESS = 0x1;
-
     private ProgressBar mProgress;
+    StringBuilder builder = new StringBuilder();
     private int mProgressStatus = 0;
-
-    private Handler mHandler = new Handler();
-
+    float [] history = new float[2];
+    String [] direction = {"NONE","NONE"};
 
     public GyroscopeActivity(){
 
@@ -59,9 +49,9 @@ public class GyroscopeActivity extends WearableActivity implements SensorEventLi
 
             }
         });
-        mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
-        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION);
-        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+        mSensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
+        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_GAME);
 
     }
 
@@ -71,68 +61,40 @@ public class GyroscopeActivity extends WearableActivity implements SensorEventLi
 
         mTextView = (TextView) findViewById(R.id.text);
 
-        float xAcc = 0;
-        float yAcc = 0;
-        float zAcc = 0;
-        final float alpha = (float) 0.8;
         long curTime = System.currentTimeMillis();
         if((curTime - lastUpdate) > 90) {
-            xAcc = event.values[0];
-            yAcc = event.values[1];
-            zAcc = event.values[2];
 
-            // Isolate the force of gravity with the low-pass filter.
-            gravity[0] = alpha * gravity[0] + (1 - alpha) * event.values[0];
-            gravity[1] = alpha * gravity[1] + (1 - alpha) * event.values[1];
-            gravity[2] = alpha * gravity[2] + (1 - alpha) * event.values[2];
+            float xChange = history[0] - event.values[0];
+            float yChange = history[1] - event.values[1];
 
-            // Remove the gravity contribution with the high-pass filter.
-            linear_acceleration[0] = event.values[0] - gravity[0];
-            linear_acceleration[1] = event.values[1] - gravity[1];
-            linear_acceleration[2] = event.values[2] - gravity[2];
+            history[0] = event.values[0];
+            history[1] = event.values[1];
 
-            float xChange = (float) (history[0] - linear_acceleration[0]);
-            float yChange = (float) (history[1] - linear_acceleration[1]);
-            float zChange = (float) (history[2] - linear_acceleration[2]);
+            if (xChange > 0.15){
+                direction[0] = "RIGHT";
+            }
+            else if (xChange < -0.15){
+                direction[0] = "LEFT";
+            }
 
-            history[0] = (float) linear_acceleration[0];
-            history[1] = (float) linear_acceleration[1];
-            history[2] = (float) linear_acceleration[2];
+            if (yChange > 2){
+                direction[1] = "DOWN";
+            }
+            else if (yChange < -2){
+                direction[1] = "UP";
+            }
 
-            if(linear_acceleration[2] < -0.45
-                    && zChange > 0.02
-                    ){
-                direction = "UP";
-                System.out.println("UP " + zChange);
-                mProgressStatus++;
-            }
-            else if (linear_acceleration[2] > 0.45
-                    && zChange < -0.02
-                    ){
-                direction = "DOWN";
-                System.out.println("DOWN " + zChange);
-                mProgressStatus--;
-            }
-            else if(linear_acceleration[0] < -0.14
-                    && xChange < -0.02
-                    ){
-                direction = "RIGHT";
-                System.out.println("RIGHT " + xChange);
-            }
-            else if (linear_acceleration[0] > 0.14
-                    && xChange < -0.02
-                    ){
-                direction = "LEFT";
-                System.out.println("LEFT " + xChange);
-            }
-            else {
-                direction = "";
-            }
+            builder.setLength(0);
+            builder.append("x: ");
+            builder.append(direction[0]);
+            builder.append(" y: ");
+            builder.append(direction[1]);
 
             if (textBool == true) {
                 //mTextView.setText("\t\n x: " + direction +"\t\n x: " + linear_acceleration[0] + "\t\n y: " + df.format(linear_acceleration[1]) + "\t\n z: " + df.format(linear_acceleration[2]));
-                mTextView.setText("\t\n x: " + direction +"\t\n x: " + df.format(xAcc) + "\t\n y: " + df.format(yAcc) + "\t\n z: " + df.format(zAcc));
-                doWork();
+                /*mTextView.setText("\t\n x: " + direction +"\t\n x: " + df.format(xAcc) + "\t\n y: " + df.format(yAcc) + "\t\n z: " + df.format(zAcc));
+                doWork();*/
+                mTextView.setText(builder.toString());
             }
             lastUpdate = curTime;
         }

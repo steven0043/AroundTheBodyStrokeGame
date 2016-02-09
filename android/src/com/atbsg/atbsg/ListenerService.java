@@ -24,7 +24,7 @@ public class ListenerService extends WearableListenerService {
     @Override
     public void onMessageReceived(MessageEvent messageEvent) {
         try {
-            System.out.println("Called" + messageEvent.getPath() );
+            System.out.println("Called " + messageEvent.getPath() );
             String direction = "";
             int progress = 0;
             addScore(messageEvent.getPath());
@@ -34,11 +34,6 @@ public class ListenerService extends WearableListenerService {
                 String score = direction.replaceAll("\\D+","");
                 direction = direction.replaceAll("\\d","");
                 MainActivity.updateProgressBar(direction, score, progress);
-                if(isDirectionVertical(direction)) {
-                    AndroidLauncher.updateVertical(progress);
-                }else{
-                    AndroidLauncher.updateHorizontal(progress);
-                }
             }
             else if (!scoreAdded && messageEvent.getPath().startsWith("2")) {
                 System.out.println("MODE " + messageEvent.getPath());
@@ -55,6 +50,16 @@ public class ListenerService extends WearableListenerService {
                 }
                 if(gameMode.equals("HARD")){
                     MainActivity.setMaximums(gameMode, 2000, 8000);
+                }
+            }else if (!scoreAdded && messageEvent.getPath().startsWith("3")) {
+                progress = ByteBuffer.wrap(messageEvent.getData()).order(ByteOrder.LITTLE_ENDIAN).getInt();
+                direction = messageEvent.getPath().substring(1);
+                String score = direction.replaceAll("\\D+","");
+                direction = direction.replaceAll("\\d","");
+                if(isDirectionVertical(direction)) {
+                    AndroidLauncher.updateVertical(progress);
+                }else{
+                    AndroidLauncher.updateHorizontal(progress);
                 }
             }
             else{

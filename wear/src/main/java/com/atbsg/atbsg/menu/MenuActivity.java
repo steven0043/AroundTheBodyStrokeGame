@@ -200,7 +200,7 @@ public class MenuActivity extends Activity implements WearableListView.ClickList
                 startSensorActivity();
             }
             if (tag == 5) {
-                startGameModeActivity(500, 2000);
+                startPhoneGameActivity();
             }
         }
         if(gameMenu && !scoreMenu) {
