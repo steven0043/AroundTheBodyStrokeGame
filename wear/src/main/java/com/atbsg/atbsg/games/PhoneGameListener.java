@@ -24,7 +24,7 @@ public class PhoneGameListener implements SensorEventListener {
     private static int mProgressStatus = 0;
     boolean moved = false;
     DirectionHelper gameHelper = new DirectionHelper();
-    int horizontalMax = 500;
+    int horizontalMax = 950;
     int verticalMax = 2000;
     public static String currentPhoneMotion = "UP";
     float [] history = new float[2];
@@ -61,50 +61,42 @@ public class PhoneGameListener implements SensorEventListener {
             linear_acceleration[2] = event.values[2] - gravity[2];
 
             if(currentPhoneMotion.equals("LEFT") || currentPhoneMotion.equals("RIGHT")){
-                gameHelper.addToHistory(linear_acceleration[0]);
+                gameHelper.addToHistory(linear_acceleration[0] * 2);
+                //gameHelper.addToHistory(linear_acceleration[0]);
             }
             if(currentPhoneMotion.equals("UP") || currentPhoneMotion.equals("DOWN")){
                 gameHelper.addToUpHistory(linear_acceleration[2]);
             }
+
             if(linear_acceleration[2] < -0.25 && currentPhoneMotion.equals("UP") &&
                     gameHelper.goingUp()){
                 if(mProgressStatus < verticalMax && mProgressStatus >= 0) {
-                    mProgressStatus = (int) (mProgressStatus + -(-linear_acceleration[2]*3) * (gameHelper.getUpAverage()*(24-((gameHelper.getHighestUpDownAverage()+1)*4))));
+                    mProgressStatus = (int) (mProgressStatus + (((-linear_acceleration[2]+ 1)*2) * (((-gameHelper.getUpAverage())) * (16-((gameHelper.getHighestUpDownAverage()/3)*4)))));
                 }
             }
             else if (linear_acceleration[2] > 0.25 && currentPhoneMotion.equals("DOWN")
                     && gameHelper.goingDown()){
                 if(mProgressStatus > 0 && mProgressStatus <= 2000) {
-                    mProgressStatus = (int) (mProgressStatus - -(-linear_acceleration[2]*3) * (gameHelper.getDownAverage()*(24-((gameHelper.getHighestUpDownAverage()+1)*4))));
+                    mProgressStatus = (int) (mProgressStatus - (((linear_acceleration[2]+1)*2) * (((gameHelper.getDownAverage())) * (16-((gameHelper.getHighestUpDownAverage()/3)*4)))));
                 }
             }
-            /*else if (xChange > 0.1 && currentPhoneMotion.equals("RIGHT") && gameHelper.goingRight()){
-                if(mProgressStatus < horizontalMax && mProgressStatus >= 0) {
-                    //System.out.println(" GOING RIGHT!! \n +" + (toPositive(linear_acceleration[0]*3) * (toPositive(gameHelper.getRightAverage())*(24-((toPositive(gameHelper.getHighestLeftRightAverage())+1)*4)))));
-                    //mProgressStatus = (int) ((mProgressStatus) + (((-gameHelper.getRightAverage())+1)*24) * ((gameHelper.getHighestLeftRightAverage())+1));
-                    mProgressStatus = (int) (mProgressStatus + -(-xChange*3) * ((gameHelper.getRightAverage()+3)*(24-((gameHelper.getHighestLeftRightAverage()+4)*4))));
-                }
-            }*/
-          /*  else if (xChange < -0.05 && currentPhoneMotion.equals("LEFT")){
-                if(mProgressStatus > 0 && mProgressStatus <= 500) {
-                    mProgressStatus = (int) ((mProgressStatus-1) - ((gameHelper.getHighestLeftRightAverage()+1)*20));
-                }
-            }*/
             else if(linear_acceleration[0] < -0.005 && currentPhoneMotion.equals("RIGHT")
-                    && gameHelper.goingRight()){
+                    && /*gameHelper.goingRight()*/ gameHelper.goingRight()){
                 if(mProgressStatus < horizontalMax && mProgressStatus >= 0) {
                     //System.out.println(" GOING RIGHT!! \n +" + (toPositive(linear_acceleration[0]*3) * (toPositive(gameHelper.getRightAverage())*(24-((toPositive(gameHelper.getHighestLeftRightAverage())+1)*4)))));
-                    mProgressStatus = (int) (mProgressStatus + -(-linear_acceleration[0] * 5) * (gameHelper.getRightAverage() * (60 - ((gameHelper.getHighestLeftRightAverage() + 3) * 4))));
+                    //mProgressStatus = (int) (mProgressStatus + -(-linear_acceleration[0] * 5) * (gameHelper.getRightAverage() * (60 - ((gameHelper.getHighestLeftRightAverage() + 3) * 4))));
+                    mProgressStatus = (int) (mProgressStatus + (((-linear_acceleration[2]+ 1)*2) * (((-gameHelper.getRightAverage())) * (16-((gameHelper.getHighestLeftRightAverage()/3)*4)))));
                 }
             }
             else if (linear_acceleration[0] > 0.005 && currentPhoneMotion.equals("LEFT")
-                    && gameHelper.goingLeft()){
+                    &&/* gameHelper.goingLeft()*/ gameHelper.goingLeft()){
                 if(mProgressStatus>horizontalMax){
                     mProgressStatus = horizontalMax;
                 }
-                if(mProgressStatus > 0 && mProgressStatus <= 500) {
+                if(mProgressStatus > 0 && mProgressStatus <= 950) {
                     // System.out.println("progress " + mProgressStatus + " LEFT SUM " + (- -(-linear_acceleration[0]*5) * (gameHelper.getLeftAverage()*(60-((gameHelper.getHighestLeftRightAverage()+3)*4)))));
-                    mProgressStatus = (int) (mProgressStatus - -(-linear_acceleration[0]*5) * (gameHelper.getLeftAverage()*(60-(((-gameHelper.getHighestLeftRightAverage())+3)*4))));
+                    //mProgressStatus = (int) (mProgressStatus - -(-linear_acceleration[0]*5) * (gameHelper.getLeftAverage()*(60-(((-gameHelper.getHighestLeftRightAverage())+3)*4))));
+                    mProgressStatus = (int) (mProgressStatus - (((linear_acceleration[2]+ 1)*2) * (((gameHelper.getLeftAverage())) * (16-((gameHelper.getHighestLeftRightAverage()/3)*4)))));
                 }
             }
 
@@ -129,7 +121,7 @@ public class PhoneGameListener implements SensorEventListener {
             mProgressStatus = 2000;
         }
         if(currentPhoneMotion.equals("LEFT")) {
-            mProgressStatus = 500;
+            mProgressStatus = 950;
         }
         else if(currentPhoneMotion.equals("RIGHT") || currentPhoneMotion.equals("UP")){
             mProgressStatus = 0;

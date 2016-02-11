@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity{
     static TextToSpeech t1;
     private static ProgressBar mProgress, mProgressHorizontal;
     public static TextView mTextView, mTextViewDifficulty;
-    int horizontalMax = 500;
+    int horizontalMax = 1000;
     public static String currentMode = "";
     int verticalMax = 2000;
     private static Logger logger;

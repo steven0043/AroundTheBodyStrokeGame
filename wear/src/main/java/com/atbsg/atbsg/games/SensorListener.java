@@ -33,7 +33,7 @@ public class SensorListener implements SensorEventListener {
     boolean moved = false;
     DirectionHelper gameHelper = new DirectionHelper();
     EasyGame easyGame = new EasyGame();
-    int horizontalMax = 500;
+    int horizontalMax = 1000;
     int verticalMax = 2000;
 
     public SensorListener(SensorManager sm, SensorActivity currentActivity, int horizontalMax, int verticalMax){
@@ -45,6 +45,7 @@ public class SensorListener implements SensorEventListener {
         logger = new Logger(currentActivity);
         v = (Vibrator) currentActivity.getSystemService(Context.VIBRATOR_SERVICE);
         mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_UI);
+        System.out.println("MAX RANGE " + mAccelerometer.getMaximumRange());
     }
 
     @Override
@@ -64,12 +65,69 @@ public class SensorListener implements SensorEventListener {
             linear_acceleration[2] = event.values[2] - gravity[2];
 
             if(easyGame.getGameDirections().get(0).equals("LEFT") || easyGame.getGameDirections().get(0).equals("RIGHT")){
-                gameHelper.addToHistory(linear_acceleration[0]);
+                //gameHelper.addToHistory(linear_acceleration[0]);
+                 gameHelper.addToHistory(linear_acceleration[0]*2);
+                //gameHelper.addToHistory(linear_acceleration[0]*3);
             }
             if(easyGame.getGameDirections().get(0).equals("UP") || easyGame.getGameDirections().get(0).equals("DOWN")){
                 gameHelper.addToUpHistory(linear_acceleration[2]);
             }
-            if(linear_acceleration[2] < -0.25 && easyGame.getGameDirections().get(0).equals("UP") &&
+
+            if(linear_acceleration[2] < -0.05 && easyGame.getGameDirections().get(0).equals("UP") &&
+                    gameHelper.goingUp()){
+                if(mProgressStatus < verticalMax ) {
+                    //mProgressStatus = (int) (mProgressStatus + -(-linear_acceleration[2]*3) * (gameHelper.getUpAverage()*(24-((gameHelper.getHighestUpDownAverage()+1)*4))));
+                        ///System.out.println("HIGHEST " + gameHelper.getHighestUpDownAverage());
+                        mProgressStatus = (int) (mProgressStatus + (((-linear_acceleration[2]+ 1)*2) * (((-gameHelper.getUpAverage())) * (16-((gameHelper.getHighestUpDownAverage()/3)*4)))));
+                }
+                else{
+                    direction = "UP";
+                    moved = true;
+                }
+            }
+            else if (linear_acceleration[2] > 0.05 && easyGame.getGameDirections().get(0).equals("DOWN")
+                    && gameHelper.goingDown()){
+                if(mProgressStatus > 0) {
+                    //mProgressStatus = (int) (mProgressStatus - -(-linear_acceleration[2]*3) * (gameHelper.getDownAverage()*(24-((gameHelper.getHighestUpDownAverage()+1)*4))));
+                    mProgressStatus = (int) (mProgressStatus - (((linear_acceleration[2]+1)*2) * (((gameHelper.getDownAverage())) * (16-((gameHelper.getHighestUpDownAverage()/3)*4)))));
+                }else{
+                    direction = "DOWN";
+                    moved = true;
+                }
+            }
+            else if(linear_acceleration[0] < -0.05 && easyGame.getGameDirections().get(0).equals("RIGHT")
+                    && gameHelper.goingRight()){
+                if(mProgressStatus < horizontalMax) {
+                    //System.out.println(" GOING RIGHT!! \n +" + (toPositive(linear_acceleration[0]*3) * (toPositive(gameHelper.getRightAverage())*(24-((toPositive(gameHelper.getHighestLeftRightAverage())+1)*4)))));
+                    //mProgressStatus = (int) (mProgressStatus + -(-linear_acceleration[0]*5) * (gameHelper.getRightAverage()*(60-((gameHelper.getHighestLeftRightAverage()+3)*4))));
+                    //mProgressStatus = (int) (mProgressStatus + -(-linear_acceleration[0]*3) * (gameHelper.getUpAverage()*(12-((gameHelper.getHighestUpDownAverage()+1)*4))));
+                    //mProgressStatus = (int) (mProgressStatus + -(-linear_acceleration[0]*3) * (gameHelper.getRightAverage()*(24-((gameHelper.getHighestLeftRightAverage()+1)*4))));
+                    mProgressStatus = (int) (mProgressStatus + (((-linear_acceleration[2]+ 1)*2) * (((-gameHelper.getRightAverage())) * (16-((gameHelper.getHighestLeftRightAverage()/3)*4)))));
+                }else {
+                    direction = "RIGHT";
+                    moved = true;
+                    //System.out.println("RIGHT " + xChange);
+                }
+            }
+            else if (linear_acceleration[0] > 0.005 && easyGame.getGameDirections().get(0).equals("LEFT")
+                    && gameHelper.goingLeft()){
+                if(mProgressStatus>horizontalMax){
+                    mProgressStatus = horizontalMax;
+                }
+                if(mProgressStatus > 0) {
+                    // System.out.println("progress " + mProgressStatus + " LEFT SUM " + (- -(-linear_acceleration[0]*5) * (gameHelper.getLeftAverage()*(60-((gameHelper.getHighestLeftRightAverage()+3)*4)))));
+                    // mProgressStatus = (int) (mProgressStatus - -(-linear_acceleration[0]*5) * (gameHelper.getLeftAverage()*(60-(((-gameHelper.getHighestLeftRightAverage())+3)*4))));
+                   // mProgressStatus = (int) (mProgressStatus - -(-linear_acceleration[0]*3) * (gameHelper.getDownAverage()*(24-((gameHelper.getHighestUpDownAverage()+1)*4))));
+                    //mProgressStatus = (int) (mProgressStatus - -(-linear_acceleration[0]*3) * (gameHelper.getLeftAverage()*(24-((gameHelper.getHighestLeftRightAverage()+1)*4))));
+                    mProgressStatus = (int) (mProgressStatus - (((linear_acceleration[2]+ 1)*2) * (((gameHelper.getLeftAverage())) * (16-((gameHelper.getHighestLeftRightAverage()/3)*4)))));
+                }else {
+                    direction = "LEFT";
+                    moved = true;
+                    //System.out.println("LEFT " + xChange);
+                }
+            }
+
+            /*if(linear_acceleration[2] < -0.25 && easyGame.getGameDirections().get(0).equals("UP") &&
                     gameHelper.goingUp()){
                 if(mProgressStatus < verticalMax ) {
                     mProgressStatus = (int) (mProgressStatus + -(-linear_acceleration[2]*3) * (gameHelper.getUpAverage()*(24-((gameHelper.getHighestUpDownAverage()+1)*4))));
@@ -89,10 +147,12 @@ public class SensorListener implements SensorEventListener {
                 }
             }
             else if(linear_acceleration[0] < -0.005 && easyGame.getGameDirections().get(0).equals("RIGHT")
-                    && gameHelper.goingRight()){
+                    && gameHelper.goingUp()){
                 if(mProgressStatus < horizontalMax) {
                     //System.out.println(" GOING RIGHT!! \n +" + (toPositive(linear_acceleration[0]*3) * (toPositive(gameHelper.getRightAverage())*(24-((toPositive(gameHelper.getHighestLeftRightAverage())+1)*4)))));
-                    mProgressStatus = (int) (mProgressStatus + -(-linear_acceleration[0]*5) * (gameHelper.getRightAverage()*(60-((gameHelper.getHighestLeftRightAverage()+3)*4))));
+                    //mProgressStatus = (int) (mProgressStatus + -(-linear_acceleration[0]*5) * (gameHelper.getRightAverage()*(60-((gameHelper.getHighestLeftRightAverage()+3)*4))));
+                      mProgressStatus = (int) (mProgressStatus + -(-linear_acceleration[0]*3) * (gameHelper.getUpAverage()*(24-((gameHelper.getHighestUpDownAverage()+1)*4))));
+                    //mProgressStatus = (int) (mProgressStatus + -(-linear_acceleration[0]*3) * (gameHelper.getRightAverage()*(24-((gameHelper.getHighestLeftRightAverage()+1)*4))));
                 }else {
                     direction = "RIGHT";
                     moved = true;
@@ -100,19 +160,21 @@ public class SensorListener implements SensorEventListener {
                 }
             }
             else if (linear_acceleration[0] > 0.005 && easyGame.getGameDirections().get(0).equals("LEFT")
-                    && gameHelper.goingLeft()){
+                    && gameHelper.goingDown()){
                 if(mProgressStatus>horizontalMax){
                     mProgressStatus = horizontalMax;
                 }
                 if(mProgressStatus > 0) {
                    // System.out.println("progress " + mProgressStatus + " LEFT SUM " + (- -(-linear_acceleration[0]*5) * (gameHelper.getLeftAverage()*(60-((gameHelper.getHighestLeftRightAverage()+3)*4)))));
-                    mProgressStatus = (int) (mProgressStatus - -(-linear_acceleration[0]*5) * (gameHelper.getLeftAverage()*(60-(((-gameHelper.getHighestLeftRightAverage())+3)*4))));
+                   // mProgressStatus = (int) (mProgressStatus - -(-linear_acceleration[0]*5) * (gameHelper.getLeftAverage()*(60-(((-gameHelper.getHighestLeftRightAverage())+3)*4))));
+                    mProgressStatus = (int) (mProgressStatus - -(-linear_acceleration[0]*3) * (gameHelper.getDownAverage()*(24-((gameHelper.getHighestUpDownAverage()+1)*4))));
+                    //mProgressStatus = (int) (mProgressStatus - -(-linear_acceleration[0]*3) * (gameHelper.getLeftAverage()*(24-((gameHelper.getHighestLeftRightAverage()+1)*4))));
                 }else {
                     direction = "LEFT";
                     moved = true;
                     //System.out.println("LEFT " + xChange);
                 }
-            }
+            }*/
             if(!(direction.equals("") && moved)){
                 if(easyGame.correctDirection(direction)){
                     easyGame.addDirection();

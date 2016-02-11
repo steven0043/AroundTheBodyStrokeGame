@@ -26,7 +26,7 @@ public class SensorActivity extends WearableActivity  {
     private boolean updatedMaximums = false;
     EasyGame easyGame = new EasyGame();
     long lastUpdate;
-    int horizontalMax = 500;
+    int horizontalMax = 1000;
     int verticalMax = 2000;
     public CloudLogger cloudLogger;
 

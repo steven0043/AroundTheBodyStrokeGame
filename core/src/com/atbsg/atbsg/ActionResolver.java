@@ -8,4 +8,5 @@ public interface ActionResolver {
     public int getHorizontal();
     public void setVertical(int vertical);
     public void sendToPhone(String message);
+    public void speak(String speech);
 }

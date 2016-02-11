@@ -43,4 +43,8 @@ public class BackgroundColour  {
         this.setRGB(49, 160, 154);
     }
 
+    public void red(){
+        this.setRGB(255, 51, 51);
+    }
+
 }

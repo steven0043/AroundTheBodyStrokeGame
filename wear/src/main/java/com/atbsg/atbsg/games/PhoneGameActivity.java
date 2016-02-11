@@ -64,6 +64,7 @@ public class PhoneGameActivity extends WearableActivity {
 
     @Override
     protected void onDestroy() {
+        cloudLogger.sendScoreToCloud("4");
         sensorListener.unregister();
         finish();
         super.onDestroy();

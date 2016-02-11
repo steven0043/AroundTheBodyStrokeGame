@@ -4,6 +4,8 @@ package com.atbsg.atbsg;
  * Created by Steven on 25/01/2016.
  */
 
+import android.content.Intent;
+
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.WearableListenerService;
 
@@ -43,13 +45,13 @@ public class ListenerService extends WearableListenerService {
                     MainActivity.playGame();
                 }
                 if(gameMode.equals("EASY")){
-                    MainActivity.setMaximums(gameMode, 500, 2000);
+                    MainActivity.setMaximums(gameMode, 1000, 2000);
                 }
                 if(gameMode.equals("MEDIUM")){
-                    MainActivity.setMaximums(gameMode, 1000, 4000);
+                    MainActivity.setMaximums(gameMode, 2000, 4000);
                 }
                 if(gameMode.equals("HARD")){
-                    MainActivity.setMaximums(gameMode, 2000, 8000);
+                    MainActivity.setMaximums(gameMode, 4000, 8000);
                 }
             }else if (!scoreAdded && messageEvent.getPath().startsWith("3")) {
                 progress = ByteBuffer.wrap(messageEvent.getData()).order(ByteOrder.LITTLE_ENDIAN).getInt();
@@ -61,6 +63,9 @@ public class ListenerService extends WearableListenerService {
                 }else{
                     AndroidLauncher.updateHorizontal(progress);
                 }
+            }
+            else if (!scoreAdded && messageEvent.getPath().startsWith("4")) {
+                sendBroadcast(new Intent("close"));
             }
             else{
                 if(!scoreAdded) {

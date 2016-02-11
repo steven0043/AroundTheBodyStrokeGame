@@ -21,7 +21,7 @@ import java.util.List;
 public class SensorMenuActivity extends Activity {
 
     private ListView lv;
-    List<String> menu_list = new ArrayList<String>(Arrays.asList("Accelerometer", "Accelerometer No Gravity", "Gyroscope"));
+    List<String> menu_list = new ArrayList<String>(Arrays.asList("Quick Game", "Magnetometer"));
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,10 +47,10 @@ public class SensorMenuActivity extends Activity {
                         if (selectedFromList.trim().equals("Accelerometer")) {
                             startAccActivity(myView);
                         }
-                        if (selectedFromList.trim().equals("Accelerometer No Gravity")) {
+                        if (selectedFromList.trim().equals("Quick Game")) {
                             startAccNoGravActivity(myView);
                         }
-                        if (selectedFromList.trim().equals("Gyroscope")) {
+                        if (selectedFromList.trim().equals("Magnetometer")) {
                             startGyroActivity(myView);
                         }
                     }

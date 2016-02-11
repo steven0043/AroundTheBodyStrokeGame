@@ -205,13 +205,13 @@ public class MenuActivity extends Activity implements WearableListView.ClickList
         }
         if(gameMenu && !scoreMenu) {
             if (tag == 0) {
-                startGameModeActivity(500, 2000);
+                startGameModeActivity(1000, 2000);
             }
             if (tag == 1) {
-                startGameModeActivity(1000, 4000);
+                startGameModeActivity(2000, 4000);
             }
             if (tag == 2) {
-                startGameModeActivity(2000, 8000);
+                startGameModeActivity(4000, 8000);
             }
         }
     }
