@@ -4,13 +4,10 @@ package com.atbsg.atbsg.games;
  * Created by Steven on 07/02/2016.
  */
 
-import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.os.Vibrator;
-
 
 public class PhoneGameListener implements SensorEventListener {
 
@@ -22,13 +19,10 @@ public class PhoneGameListener implements SensorEventListener {
     private double[] gravity ={0,0,0};
     private double[] linear_acceleration ={0,0,0};
     private static int mProgressStatus = 0;
-    boolean moved = false;
-    DirectionHelper gameHelper = new DirectionHelper();
+    DirectionHelper directionHelper = new DirectionHelper();
     int horizontalMax = 950;
     int verticalMax = 2000;
     public static String currentPhoneMotion = "UP";
-    float [] history = new float[2];
-    String [] direction = {"NONE","NONE"};
 
     public PhoneGameListener(SensorManager sm, PhoneGameActivity currentActivity){
         this.currentActivity = currentActivity;
@@ -42,69 +36,108 @@ public class PhoneGameListener implements SensorEventListener {
 
         long curTime = System.currentTimeMillis();
 
-        /*float xChange = history[0] - event.values[0];
-        float yChange = history[1] - event.values[1];
-
-        history[0] = event.values[0];
-        history[1] = event.values[1];*/
-
         if((curTime - lastUpdate) > 10) {
 
-            // Isolate the force of gravity with the low-pass filter.
-            gravity[0] = alpha * gravity[0] + (1 - alpha) * event.values[0];
-            gravity[1] = alpha * gravity[1] + (1 - alpha) * event.values[1];
-            gravity[2] = alpha * gravity[2] + (1 - alpha) * event.values[2];
+            removeGravity(event);
 
-            // Remove the gravity contribution with the high-pass filter.
-            linear_acceleration[0] = event.values[0] - gravity[0];
-            linear_acceleration[1] = event.values[1] - gravity[1];
-            linear_acceleration[2] = event.values[2] - gravity[2];
+            addToAverages();
 
-            if(currentPhoneMotion.equals("LEFT") || currentPhoneMotion.equals("RIGHT")){
-                gameHelper.addToHistory(linear_acceleration[0] * 2);
-                //gameHelper.addToHistory(linear_acceleration[0]);
+            if(goingUp()){
+                applyUpWeighting();
             }
-            if(currentPhoneMotion.equals("UP") || currentPhoneMotion.equals("DOWN")){
-                gameHelper.addToUpHistory(linear_acceleration[2]);
+            else if (goingDown()){
+                applyDownWeighting();
             }
-
-            if(linear_acceleration[2] < -0.25 && currentPhoneMotion.equals("UP") &&
-                    gameHelper.goingUp()){
-                if(mProgressStatus < verticalMax && mProgressStatus >= 0) {
-                    mProgressStatus = (int) (mProgressStatus + (((-linear_acceleration[2]+ 1)*2) * (((-gameHelper.getUpAverage())) * (16-((gameHelper.getHighestUpDownAverage()/3)*4)))));
-                }
+            else if(goingRight()){
+                applyRightWeighting();
             }
-            else if (linear_acceleration[2] > 0.25 && currentPhoneMotion.equals("DOWN")
-                    && gameHelper.goingDown()){
-                if(mProgressStatus > 0 && mProgressStatus <= 2000) {
-                    mProgressStatus = (int) (mProgressStatus - (((linear_acceleration[2]+1)*2) * (((gameHelper.getDownAverage())) * (16-((gameHelper.getHighestUpDownAverage()/3)*4)))));
-                }
-            }
-            else if(linear_acceleration[0] < -0.005 && currentPhoneMotion.equals("RIGHT")
-                    && /*gameHelper.goingRight()*/ gameHelper.goingRight()){
-                if(mProgressStatus < horizontalMax && mProgressStatus >= 0) {
-                    //System.out.println(" GOING RIGHT!! \n +" + (toPositive(linear_acceleration[0]*3) * (toPositive(gameHelper.getRightAverage())*(24-((toPositive(gameHelper.getHighestLeftRightAverage())+1)*4)))));
-                    //mProgressStatus = (int) (mProgressStatus + -(-linear_acceleration[0] * 5) * (gameHelper.getRightAverage() * (60 - ((gameHelper.getHighestLeftRightAverage() + 3) * 4))));
-                    mProgressStatus = (int) (mProgressStatus + (((-linear_acceleration[2]+ 1)*2) * (((-gameHelper.getRightAverage())) * (16-((gameHelper.getHighestLeftRightAverage()/3)*4)))));
-                }
-            }
-            else if (linear_acceleration[0] > 0.005 && currentPhoneMotion.equals("LEFT")
-                    &&/* gameHelper.goingLeft()*/ gameHelper.goingLeft()){
-                if(mProgressStatus>horizontalMax){
-                    mProgressStatus = horizontalMax;
-                }
-                if(mProgressStatus > 0 && mProgressStatus <= 950) {
-                    // System.out.println("progress " + mProgressStatus + " LEFT SUM " + (- -(-linear_acceleration[0]*5) * (gameHelper.getLeftAverage()*(60-((gameHelper.getHighestLeftRightAverage()+3)*4)))));
-                    //mProgressStatus = (int) (mProgressStatus - -(-linear_acceleration[0]*5) * (gameHelper.getLeftAverage()*(60-(((-gameHelper.getHighestLeftRightAverage())+3)*4))));
-                    mProgressStatus = (int) (mProgressStatus - (((linear_acceleration[2]+ 1)*2) * (((gameHelper.getLeftAverage())) * (16-((gameHelper.getHighestLeftRightAverage()/3)*4)))));
-                }
+            else if (goingLeft()) {
+                applyLeftWeighting();
             }
 
-            currentActivity.sendToPhone("30"+currentPhoneMotion, mProgressStatus);
+            updateView();
+
             lastUpdate = curTime;
         }
     }
 
+    public void removeGravity(SensorEvent event){
+        // Isolate the force of gravity with the low-pass filter.
+        gravity[0] = alpha * gravity[0] + (1 - alpha) * event.values[0];
+        gravity[1] = alpha * gravity[1] + (1 - alpha) * event.values[1];
+        gravity[2] = alpha * gravity[2] + (1 - alpha) * event.values[2];
+
+        // Remove the gravity contribution with the high-pass filter.
+        linear_acceleration[0] = event.values[0] - gravity[0];
+        linear_acceleration[1] = event.values[1] - gravity[1];
+        linear_acceleration[2] = event.values[2] - gravity[2];
+    }
+
+    public void addToAverages(){
+        if(currentPhoneMotion.equals("LEFT") || currentPhoneMotion.equals("RIGHT")){
+            directionHelper.addToHistory(linear_acceleration[0]*2);
+        }
+        if(currentPhoneMotion.equals("UP") || currentPhoneMotion.equals("DOWN")){
+            directionHelper.addToUpHistory(linear_acceleration[2]);
+        }
+    }
+
+    public boolean goingUp(){
+        return linear_acceleration[2] < -0.25 && currentPhoneMotion.equals("UP") &&
+                directionHelper.goingUp();
+    }
+
+    public void applyUpWeighting(){
+        if(mProgressStatus < verticalMax && mProgressStatus >= 0) {
+            mProgressStatus = (int) (mProgressStatus + (((-linear_acceleration[2]+ 1)*2) * (((-directionHelper.getUpAverage())) * (16-((directionHelper.getHighestUpDownAverage()/3)*4)))));
+        }
+    }
+
+    public boolean goingDown(){
+        return linear_acceleration[2] > 0.25 && currentPhoneMotion.equals("DOWN")
+                && directionHelper.goingDown();
+    }
+
+    public void applyDownWeighting(){
+        if(mProgressStatus > 0 && mProgressStatus <= 2000) {
+            mProgressStatus = (int) (mProgressStatus - (((linear_acceleration[2]+1)*2) * (((directionHelper.getDownAverage())) * (16-((directionHelper.getHighestUpDownAverage()/3)*4)))));
+        }
+    }
+
+    public boolean goingRight(){
+        return linear_acceleration[0] < -0.005 && currentPhoneMotion.equals("RIGHT")
+                && /*directionHelper.goingRight()*/ directionHelper.goingRight();
+    }
+
+    public void applyRightWeighting(){
+        if(mProgressStatus < horizontalMax && mProgressStatus >= 0) {
+            double highestAvgWeight =  Math.abs(16-((directionHelper.getHighestLeftRightAverage()/3)*4));
+            double currentAvgWeight = Math.abs(-directionHelper.getRightAverage());
+            double currentValueWeight = Math.abs(((-linear_acceleration[2]+1)*2));
+            mProgressStatus = (int) (mProgressStatus + (currentValueWeight * (currentAvgWeight * highestAvgWeight)));
+        }
+    }
+
+    public boolean goingLeft(){
+        return linear_acceleration[0] > 0.005 && currentPhoneMotion.equals("LEFT")
+                && directionHelper.goingLeft();
+    }
+
+    public void applyLeftWeighting(){
+        if(mProgressStatus>horizontalMax){
+            mProgressStatus = horizontalMax;
+        }
+        if(mProgressStatus > 0 && mProgressStatus <= 950) {
+            double highestAvgWeight =  Math.abs(16-((directionHelper.getHighestLeftRightAverage()/3)*4));
+            double currentAvgWeight = Math.abs(directionHelper.getLeftAverage());
+            double currentValueWeight = Math.abs(((linear_acceleration[2]+ 1)*2));
+            mProgressStatus = (int) (mProgressStatus - (currentAvgWeight * (currentAvgWeight* highestAvgWeight)));
+        }
+    }
+
+    public void updateView(){
+        currentActivity.sendToPhone("30"+currentPhoneMotion, mProgressStatus);
+    }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {

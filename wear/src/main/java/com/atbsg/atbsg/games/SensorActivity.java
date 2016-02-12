@@ -12,7 +12,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.atbsg.atbsg.R;
-import com.atbsg.atbsg.games.*;
 import com.atbsg.atbsg.logging.CloudLogger;
 
 import java.util.ArrayList;
@@ -24,7 +23,7 @@ public class SensorActivity extends WearableActivity  {
     private SensorListener sensorListener;
     private ProgressBar mProgress, mProgressHorizontal;
     private boolean updatedMaximums = false;
-    EasyGame easyGame = new EasyGame();
+    GameHelper gameHelper = new GameHelper();
     long lastUpdate;
     int horizontalMax = 1000;
     int verticalMax = 2000;
@@ -63,7 +62,7 @@ public class SensorActivity extends WearableActivity  {
                 mProgressHorizontal.setProgressDrawable(hozDraw);
                 mProgressHorizontal.setMax(horizontalMax);
                 mProgress.setMax(verticalMax);
-                setmTextView(easyGame.getGameDirections(), 0);
+                setmTextView(gameHelper.getGameDirections(), 0);
                 textBool = true;
                 makeHorizontalInvisible();
 

@@ -12,8 +12,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.atbsg.atbsg.R;
-import com.atbsg.atbsg.games.*;
-import com.atbsg.atbsg.games.SensorActivity;
 import com.atbsg.atbsg.logging.CloudLogger;
 import com.atbsg.atbsg.menu.MenuActivity;
 //import com.aroundbodygame.stroke.aroundthebodystrokegame.games.SensorActivity;
@@ -31,7 +29,7 @@ public class CalibrationActivity extends WearableActivity {
     private boolean gameStarted = false;
     private boolean spoken = false;
     public CalibrationListener sensorListener;
-    EasyGame easyGame = new EasyGame();
+    GameHelper gameHelper = new GameHelper();
     CloudLogger cloudLogger;
 
     public CalibrationActivity(){

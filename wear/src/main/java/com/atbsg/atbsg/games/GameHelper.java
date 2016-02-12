@@ -6,14 +6,12 @@ import java.util.Random;
 /**
  * Created by Steven on 12/11/2015.
  */
-public class EasyGame {
-    /*ArrayList<String> gameDirections = new ArrayList<String>(Arrays.asList("UP", "RIGHT", "LEFT"));
-    ArrayList<String> allDirections = new ArrayList<String>(Arrays.asList("UP", "DOWN", "RIGHT", "LEFT"));*/
+public class GameHelper {
     ArrayList<String> gameDirections = new ArrayList<String>(Arrays.asList("UP", "DOWN", "RIGHT", "LEFT"));
     ArrayList<String> allDirections = new ArrayList<String>(Arrays.asList("UP", "DOWN", "RIGHT", "LEFT"));
     Random rand = new Random();
     int i = 0;
-    public EasyGame(){
+    public GameHelper(){
 
     }
 
@@ -46,6 +44,31 @@ public class EasyGame {
         }else {
             i++;
         }
+    }
+
+    private boolean checkCurrent(String direction){
+        if(getNextDirections().equals(direction)){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+    public boolean isUp(){
+        return checkCurrent("UP");
+    }
+
+    public boolean isDown(){
+        return checkCurrent("DOWN");
+    }
+
+    public boolean isRight(){
+        return checkCurrent("RIGHT");
+    }
+
+    public boolean isLeft(){
+        return checkCurrent("LEFT");
     }
 
     public void remove(){
