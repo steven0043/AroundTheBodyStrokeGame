@@ -88,26 +88,14 @@ public class ListenerService extends WearableListenerService {
             if (mode.contains("easy")) {
                 System.out.println("Adding easy" );
                 new ScorePoster().execute(userId, Integer.toString(score), new Date().toString(), "Easy");
-               /* ParseObject easyMode = new ParseObject("EasyMode");
-                easyMode.put("userId", userId);
-                easyMode.put("score", score);
-                easyMode.saveInBackground();*/
             }
             if (mode.contains("medium")) {
                 System.out.println("Adding medium" );
                 new ScorePoster().execute(userId, Integer.toString(score), new Date().toString(), "Medium");
-                /*ParseObject mediumMode = new ParseObject("MediumMode");
-                mediumMode.put("userId", userId);
-                mediumMode.put("score", score);
-                mediumMode.saveInBackground();*/
             }
             if (mode.contains("hard")) {
                 System.out.println("Adding hard" );
                 new ScorePoster().execute(userId, Integer.toString(score), new Date().toString(), "Hard");
-               /* ParseObject hardMode = new ParseObject("HardMode");
-                hardMode.put("userId", userId);
-                hardMode.put("score", score);
-                hardMode.saveInBackground();*/
             }
         }
     }

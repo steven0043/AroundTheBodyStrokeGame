@@ -93,7 +93,7 @@ public class SensorListener implements SensorEventListener {
 
     private void applyUpWeighting(){
         if(mProgressStatus < verticalMax ) {
-            mProgressStatus = (int) (mProgressStatus + (((-linear_acceleration[2]+ 1)*2) * (((-directionHelper.getUpAverage())) * (16-((directionHelper.getHighestUpDownAverage()/3)*4)))));
+            mProgressStatus = (int) (mProgressStatus + (((-linear_acceleration[2]+ 1)*2) * (((-directionHelper.getUpAverage())) * (16-((directionHelper.getHighestCurrentAverage()/3)*4)))));
         }
         else{
             direction = "UP";
@@ -103,7 +103,7 @@ public class SensorListener implements SensorEventListener {
 
     private void applyDownWeighting(){
         if(mProgressStatus > 0) {
-            mProgressStatus = (int) (mProgressStatus - (((linear_acceleration[2]+1)*2) * (((directionHelper.getDownAverage())) * (16-((directionHelper.getHighestUpDownAverage()/3)*4)))));
+            mProgressStatus = (int) (mProgressStatus - (((linear_acceleration[2]+1)*2) * (((directionHelper.getDownAverage())) * (16-((directionHelper.getHighestCurrentAverage()/3)*4)))));
         }else{
             direction = "DOWN";
             moved = true;
@@ -115,7 +115,7 @@ public class SensorListener implements SensorEventListener {
             mProgressStatus = horizontalMax;
         }
         if(mProgressStatus > 0) {
-            double highestAvgWeight =  toPositive(16 - ((directionHelper.getHighestLeftRightAverage() / 3) * 4));
+            double highestAvgWeight =  toPositive(16 - ((directionHelper.getHighestCurrentAverage() / 3) * 4));
             double currentAvgWeight = toPositive(directionHelper.getLeftAverage());
             double currentValueWeight = toPositive(((linear_acceleration[2]+ 1)*2));
             mProgressStatus = (int) (mProgressStatus - (currentAvgWeight * (currentAvgWeight* highestAvgWeight)));
@@ -127,7 +127,7 @@ public class SensorListener implements SensorEventListener {
 
     private void applyRightWeighting(){
         if(mProgressStatus < horizontalMax) {
-            double highestAvgWeight =  toPositive(16 - ((directionHelper.getHighestLeftRightAverage() / 3) * 4));
+            double highestAvgWeight =  toPositive(16 - ((directionHelper.getHighestCurrentAverage() / 3) * 4));
             double currentAvgWeight = toPositive(-directionHelper.getRightAverage());
             double currentValueWeight = toPositive(((-linear_acceleration[2] + 1) * 2));
             mProgressStatus = (int) (mProgressStatus + (currentAvgWeight * (currentAvgWeight* highestAvgWeight)));
@@ -158,10 +158,10 @@ public class SensorListener implements SensorEventListener {
 
     public void addToAverages(){
         if(gameHelper.isLeft() || gameHelper.isRight()) {
-            directionHelper.addToHistory(linear_acceleration[0] * 2);
+            directionHelper.addToHorizontalHistory(linear_acceleration[0] * 2);
         }
         if(gameHelper.isUp() || gameHelper.isDown()){
-            directionHelper.addToUpHistory(linear_acceleration[2]);
+            directionHelper.addToVerticalHistory(linear_acceleration[2]);
         }
     }
 

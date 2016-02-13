@@ -281,6 +281,10 @@ public class GameScreen implements Screen {
                 game.actionResolver.sendToPhone(gameDirections.get(counter));
                 display = gameDirections.get(counter);
                 score = score + 1;
+                setCurrentHighScore(score);
+                if(score > getHighScore()){
+                    setHighScore(score);
+                }
                 scoreSound.play(1);
                 updateRecs();
                 holdTime = 0;
@@ -319,6 +323,18 @@ public class GameScreen implements Screen {
         img = 0;
         theCounter = 0;
         circleRec.x = hole1.x + ((hole1.width/2)-25);
+    }
+
+    public void setHighScore(int score){
+        game.actionResolver.setGameHighScore(score);
+    }
+
+    public int getHighScore(){
+        return game.actionResolver.getGameHighScore();
+    }
+
+    public void setCurrentHighScore(int score){
+        game.actionResolver.setCurrentGameScore(score);
     }
 
     public void speak(String message){

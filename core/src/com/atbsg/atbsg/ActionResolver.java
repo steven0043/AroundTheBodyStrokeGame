@@ -9,4 +9,7 @@ public interface ActionResolver {
     public void setVertical(int vertical);
     public void sendToPhone(String message);
     public void speak(String speech);
+    public void setGameHighScore(int score);
+    public int getGameHighScore();
+    public void setCurrentGameScore(int score);
 }

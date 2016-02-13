@@ -11,6 +11,7 @@ import android.view.WindowManager;
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 
+import java.util.Date;
 import java.util.Locale;
 
 public class AndroidLauncher extends AndroidApplication implements ActionResolver {
@@ -18,6 +19,7 @@ public class AndroidLauncher extends AndroidApplication implements ActionResolve
 	CloudLogger cloudLogger;
 	TextToSpeech t1;
 	Logger logger;
+	private int currentGameScore = 0;
 
 	public AndroidLauncher(){
 
@@ -87,10 +89,27 @@ public class AndroidLauncher extends AndroidApplication implements ActionResolve
 	}
 
 	@Override
+	public void setGameHighScore(int score) {
+		logger.setGameHighScore(score);
+	}
+
+	@Override
+	public int getGameHighScore() {
+		return logger.getGameHighScore();
+	}
+
+	@Override
+	public void setCurrentGameScore(int score) {
+		currentGameScore = score;
+	}
+
+	@Override
 	protected void onDestroy () {
+		new ScorePoster().execute("QSV46T", Integer.toString(currentGameScore), new Date().toString(), "Game");
 		unregisterReceiver(closeGame);
 		super.onDestroy();
 	}
+
 	private final BroadcastReceiver closeGame = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {

@@ -61,11 +61,11 @@ public class GyroscopeActivity extends WearableActivity implements SensorEventLi
     public void onSensorChanged(SensorEvent event){
         long curTime = System.currentTimeMillis();
 
-        /*float xChange = history[0] - event.values[0];
-        float yChange = history[1] - event.values[1];
+        /*float xChange = horizontalHistory[0] - event.values[0];
+        float yChange = horizontalHistory[1] - event.values[1];
 
-        history[0] = event.values[0];
-        history[1] = event.values[1];*/
+        horizontalHistory[0] = event.values[0];
+        horizontalHistory[1] = event.values[1];*/
 
         if((curTime - lastUpdate) > 10) {
 

@@ -75,10 +75,10 @@ public class PhoneGameListener implements SensorEventListener {
 
     public void addToAverages(){
         if(currentPhoneMotion.equals("LEFT") || currentPhoneMotion.equals("RIGHT")){
-            directionHelper.addToHistory(linear_acceleration[0]*2);
+            directionHelper.addToHorizontalHistory(linear_acceleration[0] * 2);
         }
         if(currentPhoneMotion.equals("UP") || currentPhoneMotion.equals("DOWN")){
-            directionHelper.addToUpHistory(linear_acceleration[2]);
+            directionHelper.addToVerticalHistory(linear_acceleration[2]);
         }
     }
 
@@ -89,7 +89,7 @@ public class PhoneGameListener implements SensorEventListener {
 
     public void applyUpWeighting(){
         if(mProgressStatus < verticalMax && mProgressStatus >= 0) {
-            mProgressStatus = (int) (mProgressStatus + (((-linear_acceleration[2]+ 1)*2) * (((-directionHelper.getUpAverage())) * (16-((directionHelper.getHighestUpDownAverage()/3)*4)))));
+            mProgressStatus = (int) (mProgressStatus + (((-linear_acceleration[2]+ 1)*2) * (((-directionHelper.getUpAverage())) * (16-((directionHelper.getHighestCurrentAverage()/3)*4)))));
         }
     }
 
@@ -100,7 +100,7 @@ public class PhoneGameListener implements SensorEventListener {
 
     public void applyDownWeighting(){
         if(mProgressStatus > 0 && mProgressStatus <= 2000) {
-            mProgressStatus = (int) (mProgressStatus - (((linear_acceleration[2]+1)*2) * (((directionHelper.getDownAverage())) * (16-((directionHelper.getHighestUpDownAverage()/3)*4)))));
+            mProgressStatus = (int) (mProgressStatus - (((linear_acceleration[2]+1)*2) * (((directionHelper.getDownAverage())) * (16-((directionHelper.getHighestCurrentAverage()/3)*4)))));
         }
     }
 
@@ -111,7 +111,7 @@ public class PhoneGameListener implements SensorEventListener {
 
     public void applyRightWeighting(){
         if(mProgressStatus < horizontalMax && mProgressStatus >= 0) {
-            double highestAvgWeight =  Math.abs(16-((directionHelper.getHighestLeftRightAverage()/3)*4));
+            double highestAvgWeight =  Math.abs(16-((directionHelper.getHighestCurrentAverage()/3)*4));
             double currentAvgWeight = Math.abs(-directionHelper.getRightAverage());
             double currentValueWeight = Math.abs(((-linear_acceleration[2]+1)*2));
             mProgressStatus = (int) (mProgressStatus + (currentValueWeight * (currentAvgWeight * highestAvgWeight)));
@@ -128,7 +128,7 @@ public class PhoneGameListener implements SensorEventListener {
             mProgressStatus = horizontalMax;
         }
         if(mProgressStatus > 0 && mProgressStatus <= 950) {
-            double highestAvgWeight =  Math.abs(16-((directionHelper.getHighestLeftRightAverage()/3)*4));
+            double highestAvgWeight =  Math.abs(16-((directionHelper.getHighestCurrentAverage()/3)*4));
             double currentAvgWeight = Math.abs(directionHelper.getLeftAverage());
             double currentValueWeight = Math.abs(((linear_acceleration[2]+ 1)*2));
             mProgressStatus = (int) (mProgressStatus - (currentAvgWeight * (currentAvgWeight* highestAvgWeight)));

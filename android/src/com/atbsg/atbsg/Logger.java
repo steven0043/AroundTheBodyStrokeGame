@@ -11,6 +11,7 @@ public class Logger {
 
     SharedPreferences prefs;
     final static String mutedKey = "muted";
+    final static String gameKey = "game";
 
     public Logger(Activity acc) {
         prefs = acc.getSharedPreferences(
@@ -26,5 +27,16 @@ public class Logger {
         boolean muted = prefs.getBoolean(mutedKey, false);
 
         return muted;
+    }
+
+    public void setGameHighScore(int score){
+        prefs.edit().putInt(gameKey, score).apply();
+    }
+
+    public int getGameHighScore() {
+
+        int highScore = prefs.getInt(gameKey, 0);
+
+        return highScore;
     }
 }
