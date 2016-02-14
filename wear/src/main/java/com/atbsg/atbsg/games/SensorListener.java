@@ -43,6 +43,11 @@ public class SensorListener implements SensorEventListener {
         mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_UI);
     }
 
+    /**
+     * Implemented method, gets called every time the
+     * registered accelerometer sensor is changed.
+     * @param event
+     */
     @Override
     public void onSensorChanged(SensorEvent event) {
 
@@ -74,11 +79,18 @@ public class SensorListener implements SensorEventListener {
         }
     }
 
+    /**
+     * Update the phones view to reflect the progress values, direction and score.
+     */
     private void updateView(){
         currentActivity.addProgressToPhone("1"+score+ gameHelper.getNextDirections(), mProgressStatus);
         currentActivity.updateProgressBar(mProgressStatus);
     }
 
+    /**
+     * Isolate and remove gravity from the sensor events values.
+     * @param event
+     */
     private void removeGravity(SensorEvent event){
         // Isolate the force of gravity with the low-pass filter.
         gravity[0] = alpha * gravity[0] + (1 - alpha) * event.values[0];
@@ -91,6 +103,9 @@ public class SensorListener implements SensorEventListener {
         linear_acceleration[2] = event.values[2] - gravity[2];
     }
 
+    /**
+     * Apply the up weighting to the current progress value.
+     */
     private void applyUpWeighting(){
         if(mProgressStatus < verticalMax ) {
             mProgressStatus = (int) (mProgressStatus + (((-linear_acceleration[2]+ 1)*2) * (((-directionHelper.getUpAverage())) * (16-((directionHelper.getHighestCurrentAverage()/3)*4)))));
@@ -101,6 +116,9 @@ public class SensorListener implements SensorEventListener {
         }
     }
 
+    /**
+     * Apply the down weighting to the current progress value.
+     */
     private void applyDownWeighting(){
         if(mProgressStatus > 0) {
             mProgressStatus = (int) (mProgressStatus - (((linear_acceleration[2]+1)*2) * (((directionHelper.getDownAverage())) * (16-((directionHelper.getHighestCurrentAverage()/3)*4)))));
@@ -110,6 +128,9 @@ public class SensorListener implements SensorEventListener {
         }
     }
 
+    /**
+     * Apply the left weighting to the current progress value.
+     */
     private void applyLeftWeighting(){
         if(mProgressStatus>horizontalMax){
             mProgressStatus = horizontalMax;
@@ -125,6 +146,9 @@ public class SensorListener implements SensorEventListener {
         }
     }
 
+    /**
+     * Apply the right weighting to the current progress value.
+     */
     private void applyRightWeighting(){
         if(mProgressStatus < horizontalMax) {
             double highestAvgWeight =  toPositive(16 - ((directionHelper.getHighestCurrentAverage() / 3) * 4));
@@ -136,26 +160,47 @@ public class SensorListener implements SensorEventListener {
             moved = true;
         }
     }
+
+    /**
+     * Check if user is moving their arm up.
+     * @return boolean
+     */
     private boolean goingUp(){
         return linear_acceleration[2] < -0.05 && gameHelper.isUp() &&
                 directionHelper.goingUp();
     }
 
+    /**
+     * Check if user is moving their arm down.
+     * @return boolean
+     */
     private boolean goingDown(){
         return linear_acceleration[2] > 0.05 && gameHelper.isDown()
                 && directionHelper.goingDown();
     }
 
+    /**
+     * Check if user is moving their arm left.
+     * @return boolean
+     */
     private boolean goingLeft(){
         return linear_acceleration[0] > 0.005 && gameHelper.isLeft()
                 && directionHelper.goingLeft();
     }
 
+    /**
+     * Check if user is moving their arm right.
+     * @return boolean
+     */
     private boolean goingRight(){
         return linear_acceleration[0] < -0.05 && gameHelper.isRight()
                 && directionHelper.goingRight();
     }
 
+    /**
+     * Add the current sensor values to a list of historical values
+     * based on the current direction required by the game mode.
+     */
     public void addToAverages(){
         if(gameHelper.isLeft() || gameHelper.isRight()) {
             directionHelper.addToHorizontalHistory(linear_acceleration[0] * 2);
@@ -165,6 +210,9 @@ public class SensorListener implements SensorEventListener {
         }
     }
 
+    /**
+     * Check if the user has completed the current indicated direction
+     */
     public void checkCompletedMovement(){
         if(!(direction.equals("") && moved)){
             if(gameHelper.correctDirection(direction)){
@@ -191,10 +239,19 @@ public class SensorListener implements SensorEventListener {
         }
     }
 
+    /**
+     * Speak the current direction.
+     * @param direction
+     */
     public void playSound(String direction){
         currentActivity.addScoreToCloud(direction);
     }
 
+    /**
+     * Turn the double parameter to a postive number
+     * @param number
+     * @return double
+     */
     public double toPositive(double number){
         return Math.abs(number);
     }
@@ -204,6 +261,11 @@ public class SensorListener implements SensorEventListener {
 
     }
 
+    /**
+     * Change the progress bar visibility on the watch based on
+     * the current direction.
+     * @param direction
+     */
     public void changeVisibility(String direction){
         if(direction.equals("UP") || direction.equals("DOWN")){
             currentActivity.makeHorizontalInvisible();
@@ -215,6 +277,9 @@ public class SensorListener implements SensorEventListener {
         }
     }
 
+    /**
+     * Adjust the progress value.
+     */
     public void adjustProgressValue(){
         if(gameHelper.isDown()){
             mProgressStatus = verticalMax;
@@ -226,6 +291,11 @@ public class SensorListener implements SensorEventListener {
             mProgressStatus = 0;
         }
     }
+
+    /**
+     * Called when the user exits the game. Save their score in
+     * shared preferences and unregisters the acceleromter.
+     */
     public void unregister() {
         if(verticalMax == 2000){
             logger.setLastEasyScore(score);

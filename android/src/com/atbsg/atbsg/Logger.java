@@ -18,10 +18,20 @@ public class Logger {
                 "com.example.app", Context.MODE_PRIVATE);
     }
 
+    /**
+     * Set the phone to be muted. Store the
+     * choice in shared preferences.
+     * @param muted
+     */
     public void setMuted(boolean muted){
         prefs.edit().putBoolean(mutedKey, muted).apply();
     }
 
+    /**
+     * Check to see if the user has previously
+     * muted the phones voice commands.
+     * @return muted
+     */
     public boolean getMuted() {
 
         boolean muted = prefs.getBoolean(mutedKey, false);
@@ -29,10 +39,18 @@ public class Logger {
         return muted;
     }
 
+    /**
+     * Sets the phone games high score.
+     * @param score
+     */
     public void setGameHighScore(int score){
         prefs.edit().putInt(gameKey, score).apply();
     }
 
+    /**
+     * Get the phone games high score.
+     * @return highScore
+     */
     public int getGameHighScore() {
 
         int highScore = prefs.getInt(gameKey, 0);

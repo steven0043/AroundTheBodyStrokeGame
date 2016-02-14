@@ -7,7 +7,7 @@ public class BackgroundColour  {
     int r, g, b;
 
     /**
-     *
+     * Constructor, sets the colour, using RGB.
      * @param r
      * @param g
      * @param b
@@ -19,7 +19,7 @@ public class BackgroundColour  {
     }
 
     /**
-     *
+     * Sets the RGB colour
      * @param r
      * @param g
      * @param b
@@ -31,7 +31,7 @@ public class BackgroundColour  {
     }
 
     /**
-     *
+     * Get the 'R' value.
      * @return
      */
     public int getR() {
@@ -39,7 +39,7 @@ public class BackgroundColour  {
     }
 
     /**
-     *
+     * Get the 'G' value.
      * @return
      */
     public int getG() {
@@ -47,7 +47,7 @@ public class BackgroundColour  {
     }
 
     /**
-     *
+     * Get the 'B' value.
      * @return
      */
     public int getB() {
@@ -55,28 +55,28 @@ public class BackgroundColour  {
     }
 
     /**
-     *
+     * Quick method the get the colour to green.
      */
     public void green(){
         this.setRGB(0, 128, 0);
     }
 
     /**
-     *
+     * Quick method the get the colour to amber.
      */
     public void amber(){
         this.setRGB(199, 136, 5);
     }
 
     /**
-     *
+     * Quick method the get the colour to blue.
      */
     public void blue(){
         this.setRGB(49, 160, 154);
     }
 
     /**
-     *
+     * Quick method the get the colour to red.
      */
     public void red(){
         this.setRGB(255, 51, 51);

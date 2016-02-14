@@ -81,21 +81,15 @@ public class MainActivity extends AppCompatActivity{
         });*/
     }
 
+    /**
+     * Updates the view on the phone based on the direction,
+     * score and dialog progress sent from the watch.
+     * @param direction
+     * @param score
+     * @param mProgressStatus
+     */
     protected static void updateProgressBar(String direction, String score, int mProgressStatus){
         final int mProgressStatuss = mProgressStatus;
-      /*  if((direction.equals("UP") || direction.equals("DOWN")) && mProgress.getVisibility() == View.INVISIBLE){
-            mProgressHorizontal.setVisibility(View.INVISIBLE);
-            mProgress.setVisibility(View.VISIBLE);
-        }
-        if((direction.equals("LEFT") || direction.equals("RIGHT")) && mProgressHorizontal.getVisibility() == View.INVISIBLE){
-            mProgressHorizontal.setVisibility(View.VISIBLE);
-            mProgress.setVisibility(View.INVISIBLE);
-        }
-        if (mProgress.getVisibility() == View.VISIBLE) {
-            mProgress.setProgress(mProgressStatuss);
-        } else if (mProgressHorizontal.getVisibility() == View.VISIBLE) {
-            mProgressHorizontal.setProgress(mProgressStatuss);
-        }*/
         if((direction.equals("UP") || direction.equals("DOWN"))){
             mProgress.setProgress(mProgressStatuss);
         }
@@ -109,6 +103,13 @@ public class MainActivity extends AppCompatActivity{
 
     }
 
+    /**
+     * Sets the maximums on the progress dialog based on the
+     * current game mode being played by the watch.
+     * @param gameMode
+     * @param horizontalMax
+     * @param verticalMax
+     */
     protected static void setMaximums(String gameMode, int horizontalMax, int verticalMax ) {
         mProgressHorizontal.setMax(horizontalMax);
         mProgress.setMax(verticalMax);
@@ -116,24 +117,12 @@ public class MainActivity extends AppCompatActivity{
         mTextViewDifficulty.setText("Difficulty: " + gameMode);
     }
 
+    /**
+     * Updates the current progress of the horizontal dialog.
+     * @param mProgressStatus
+     */
     protected void updateHorizontalProgressBar(int mProgressStatus){
         mProgressHorizontal.setProgress(mProgressStatus);
-    }
-
-    protected void makeVerticalVisible(){
-        mProgress.setVisibility(View.VISIBLE);
-    }
-
-    protected void makeHorizontalVisible(){
-        mProgressHorizontal.setVisibility(View.VISIBLE);
-    }
-
-    protected void makeVerticalInvisible(){
-        mProgress.setVisibility(View.INVISIBLE);
-    }
-
-    protected void makeHorizontalInvisible(){
-        mProgressHorizontal.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -179,11 +168,18 @@ public class MainActivity extends AppCompatActivity{
         super.onPause();
     }
 
+    /**
+     * Opens up the game mode when selected on the phone.
+     */
     public static void playGame(){
         Intent intent = new Intent(mContext, game.getClass());
         mContext.startActivity(intent);
     }
 
+    /**
+     * Plays speech through the phone.
+     * @param speech
+     */
     public static void speak(String speech){
         try {
             System.out.println("SPEAKING " + speech);
@@ -198,6 +194,10 @@ public class MainActivity extends AppCompatActivity{
         }
     }
 
+    /**
+     * Prevents the user from exiting the app, this is used to keep
+     * the app running while the games are being played on the watch.
+     */
     @Override
     public void onBackPressed() {
 

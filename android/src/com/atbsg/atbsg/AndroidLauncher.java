@@ -25,14 +25,29 @@ public class AndroidLauncher extends AndroidApplication implements ActionResolve
 
 	}
 
+	/**
+	 * Updates current vertical coordinate based on the watches
+	 * accelerometer.
+	 * @param mProgressStatus
+	 */
 	protected static void updateVertical(int mProgressStatus){
 		vertical = mProgressStatus;
 	}
 
+	/**
+	 * Updates current horizontal coordinate based on the watches
+	 * accelerometer.
+	 * @param mProgressStatus
+	 */
 	protected static void updateHorizontal(int mProgressStatus){
 		horizontal = mProgressStatus;
 	}
 
+	/**
+	 * Activity's onCreate method
+	 *
+	 * @param savedInstanceState
+	 */
 	@Override
 	protected void onCreate (Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -53,26 +68,51 @@ public class AndroidLauncher extends AndroidApplication implements ActionResolve
 		initialize(new ATBSG(this), config);
 	}
 
+	/**
+	 * Get vertical coordinate for game
+	 * @return int current vertical number based on
+	 * watch accelerometer
+	 */
 	@Override
 	public int getVertical() {
 		return vertical;
 	}
 
+	/**
+	 * Get horizontal coordinate for game
+	 * @return int current horizontal number based on
+	 * watch accelerometer
+	 */
 	@Override
 	public int getHorizontal() {
 		return horizontal;
 	}
 
+	/**
+	 * Sets the current vertical coordinate for the
+	 * phone game based on watch accelerometer
+	 * @param vertical
+	 */
 	@Override
 	public void setVertical(int vertical) {
 		AndroidLauncher.vertical=vertical;
 	}
 
+	/**
+	 * Send a message to the watch
+	 * this is used to let the watch know
+	 * when to change the direction of movement.
+	 * @param message
+	 */
 	@Override
 	public void sendToPhone(String message) {
 		cloudLogger.sendScoreToCloud(message);
 	}
 
+	/**
+	 * Plays speech through the phone.
+	 * @param speech
+	 */
 	@Override
 	public void speak(String speech){
 		try {
@@ -88,16 +128,28 @@ public class AndroidLauncher extends AndroidApplication implements ActionResolve
 		}
 	}
 
+	/**
+	 * Set the game high score in shared preferences
+	 * @param score
+	 */
 	@Override
 	public void setGameHighScore(int score) {
 		logger.setGameHighScore(score);
 	}
 
+	/**
+	 * Get the game high score in shared preferences
+	 * @return
+	 */
 	@Override
 	public int getGameHighScore() {
 		return logger.getGameHighScore();
 	}
 
+	/**
+	 * Set the latest game score in shared preferences
+	 * @param score
+	 */
 	@Override
 	public void setCurrentGameScore(int score) {
 		currentGameScore = score;
@@ -110,6 +162,10 @@ public class AndroidLauncher extends AndroidApplication implements ActionResolve
 		super.onDestroy();
 	}
 
+	/**
+	 * Broadcast receiver, listening to when the user has exited
+	 * the game on their watch
+	 */
 	private final BroadcastReceiver closeGame = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {

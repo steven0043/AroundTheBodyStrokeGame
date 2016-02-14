@@ -28,11 +28,19 @@ public class CloudLogger {
         contextClass = context.getClass().getSimpleName();
     }
 
+    /**
+     * Initiates the connection to the watch
+     */
     public void initApi() {
         client = getGoogleApiClient(context);
         retrieveDeviceNode();
     }
 
+    /**
+     * Gets the Google API client
+     * @param context
+     * @return the created Google API client
+     */
     private GoogleApiClient getGoogleApiClient(Context context) {
         System.out.println("Initializing!!!");
         return new GoogleApiClient.Builder(context)
@@ -54,20 +62,16 @@ public class CloudLogger {
                 List<Node> nodes = result.getNodes();
                 if (nodes.size() > 0) {
                     nodeId = nodes.get(0).getId();
-                    playStartMessages();
                     connected = true;
-                    System.out.println("CONNECTED!!! " + nodeId);
+                    //System.out.println("CONNECTED!!! " + nodeId);
                 }
                 client.disconnect();
             }
         }).start();
     }
 
-    public void playStartMessages(){
-        //sendScoreToCloud("Hello from phone!");
-    }
     /**
-     * Sends a message to the connected mobile device
+     * Sends message to the watch that's connected.
      */
     public void sendScoreToCloud(final String gameMode) {
         //System.out.println("SENDING score null");
@@ -83,6 +87,12 @@ public class CloudLogger {
             }).start();
         }
     }
+
+    /**
+     * Returns a boolean indicating if a connection has been
+     * established with the watch.
+     * @return connected
+     */
     public boolean isConnected(){
         return connected;
     }

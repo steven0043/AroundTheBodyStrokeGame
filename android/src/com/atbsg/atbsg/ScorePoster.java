@@ -21,6 +21,11 @@ public class ScorePoster  extends AsyncTask<String,Void,String>{
 
     }
 
+    /**
+     * Sends the scores to the MySQL database.
+     * @param arg0
+     * @return
+     */
     @Override
     protected String doInBackground(String... arg0) {
         try{

@@ -10,6 +10,10 @@ import com.google.android.gms.wearable.WearableListenerService;
 
 public class ListenerService extends WearableListenerService {
 
+    /**
+     * Method that receives messages from the phone.
+     * @param messageEvent
+     */
     @Override
     public void onMessageReceived(MessageEvent messageEvent) {
         System.out.println("Called wear" + messageEvent.getPath());

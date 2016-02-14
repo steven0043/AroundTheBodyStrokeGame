@@ -56,14 +56,24 @@ public class CalibrationActivity extends WearableActivity {
 
             }
         });
+        //Create a new sensor listener.
         sensorListener = new CalibrationListener((SensorManager)getSystemService(Context.SENSOR_SERVICE), this);
     }
 
+    /**
+     * Set and change the text view
+     * @param text
+     */
     protected void setmTextView(String text) {
         mTextView.setText("");
         mTextView.setText(text);
     }
 
+    /**
+     * Change the imageView based on whether the user
+     * has completed the calibration procedure.
+     * @param calibrated
+     */
     public void setImageView(boolean calibrated) {
         final boolean calibratedd = calibrated;
         runOnUiThread(new Runnable(){
@@ -87,6 +97,9 @@ public class CalibrationActivity extends WearableActivity {
         });
     }
 
+    /**
+     * Loads the game.
+     */
     public void loadGame(){
         imageView.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -102,11 +115,11 @@ public class CalibrationActivity extends WearableActivity {
         });
     }
 
+    /**
+     * Loads the game menu.
+     */
     public void startGame(){
-        System.out.println("Trying to start!" );
-        System.out.println("LOADING!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         if(!gameStarted){
-            System.out.println("LOADING!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
             gameStarted = true;
             sensorListener.unregister();
             Bundle b=new Bundle();
@@ -126,10 +139,12 @@ public class CalibrationActivity extends WearableActivity {
 
     @Override
     protected void onPause() {
-        System.out.println("PAUSEESEDDD");
         super.onPause();
     }
 
+    /**
+     * Activity onDestroy, unregisters the sensor listener
+     */
     @Override
     protected void onDestroy() {
         sensorListener.unregister();

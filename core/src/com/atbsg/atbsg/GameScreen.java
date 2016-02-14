@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
@@ -54,6 +53,10 @@ public class GameScreen implements Screen {
         speak("Follow the directions on screen and try to get the ball inside the circle!");
     }
 
+    /**
+     * Render method called every delta time.
+     * @param delta
+     */
     @Override
     public void render(float delta) {
         curTime = System.currentTimeMillis();
@@ -64,6 +67,9 @@ public class GameScreen implements Screen {
         holdIt();
     }
 
+    /**
+     * Draws the textures and fonts
+     */
     public void drawGame(){
         Gdx.gl.glClearColor(backgroundColour.getR() / 255.0f, backgroundColour.getG() / 255.0f, backgroundColour.getB() / 255.0f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -79,6 +85,9 @@ public class GameScreen implements Screen {
         game.batch.end();
     }
 
+    /**
+     * Creates the rectangles that represent the circles and the ball.
+     */
     public void createRecs() {
         hole1 = new Rectangle();
         hole1.x = 380;
@@ -102,6 +111,10 @@ public class GameScreen implements Screen {
         circleArray.add(holeCircle75);
     }
 
+    /**
+     * Update the rectangles position and size based
+     * on the current game state.
+     */
     public void updateRecs() {
         lastUpdateTime = System.currentTimeMillis();
         if(score%5==0 && score >0 && theCounter <3) {
@@ -216,6 +229,10 @@ public class GameScreen implements Screen {
         speak(gameDirections.get(counter));
     }
 
+    /**
+     * Update the position of the ball and check if it has gone past the
+     * circle based on the direction(UP/DOWN).
+     */
     public void checkUpDown(){
         if(gameDirections.get(counter).equals("UP") || gameDirections.get(counter).equals("DOWN")) {
             circleRec.y=(game.actionResolver.getVertical()/2);
@@ -242,6 +259,10 @@ public class GameScreen implements Screen {
         }
     }
 
+    /**
+     * Update the position of the ball and check if it has gone past the
+     * circle based on the direction(LEFT/RIGHT).
+     */
     public void checkLeftRight(){
         if(gameDirections.get(counter).equals("LEFT") || gameDirections.get(counter).equals("RIGHT")) {
             circleRec.x=game.actionResolver.getHorizontal();
@@ -269,6 +290,9 @@ public class GameScreen implements Screen {
         }
     }
 
+    /**
+     * Check if the ball is inside the current circle.
+     */
     public void isInside(){
         if(hole1.contains(circleRec)){
             updateBool = true;
@@ -281,7 +305,7 @@ public class GameScreen implements Screen {
                 game.actionResolver.sendToPhone(gameDirections.get(counter));
                 display = gameDirections.get(counter);
                 score = score + 1;
-                setCurrentHighScore(score);
+                setCurrentGameScore(score);
                 if(score > getHighScore()){
                     setHighScore(score);
                 }
@@ -299,6 +323,10 @@ public class GameScreen implements Screen {
         }
     }
 
+    /**
+     * If the ball is inside the circle, start the countdown from
+     * 2 seconds and update the current display to show this.
+     */
     public void holdIt(){
         if(((curTime - lastUpdate) > 100) && updateBool) {
             if(!spoken && spokenCounter < 3) {
@@ -316,6 +344,10 @@ public class GameScreen implements Screen {
         }
     }
 
+    /**
+     * Reset the rectangles size and position if they
+     * have to start again.
+     */
     public void reset(){
         backgroundColour.blue();
         hole1.width = recKeeper[theCounter];
@@ -325,18 +357,30 @@ public class GameScreen implements Screen {
         circleRec.x = hole1.x + ((hole1.width/2)-25);
     }
 
+    /**
+     * Sets the high score for the game.
+     */
     public void setHighScore(int score){
         game.actionResolver.setGameHighScore(score);
     }
 
+    /**
+     * Gets the high score for the game.
+     */
     public int getHighScore(){
         return game.actionResolver.getGameHighScore();
     }
 
-    public void setCurrentHighScore(int score){
+    /**
+     * Sets the current game score.
+     */
+    public void setCurrentGameScore(int score){
         game.actionResolver.setCurrentGameScore(score);
     }
 
+    /**
+     * Speak the current game directions or informative messages.
+     */
     public void speak(String message){
         game.actionResolver.speak(message);
     }
@@ -361,6 +405,9 @@ public class GameScreen implements Screen {
     public void resume() {
     }
 
+    /**
+     * Garbage collection. Dispose of all the texture, fonts and sounds.
+     */
     @Override
     public void dispose() {
         circle.dispose();

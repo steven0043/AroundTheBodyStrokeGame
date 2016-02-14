@@ -36,11 +36,19 @@ public class CloudLogger {
         contextClass = context.getClass().getSimpleName();
     }
 
+    /**
+     * Initiates the connection to the phone
+     */
     public void initApi() {
         client = getGoogleApiClient(context);
         retrieveDeviceNode();
     }
 
+    /**
+     * Gets the Google API client
+     * @param context
+     * @return the created Google API client
+     */
     private GoogleApiClient getGoogleApiClient(Context context) {
         System.out.println("Initializing!!!");
         return new GoogleApiClient.Builder(context)
@@ -92,7 +100,7 @@ public class CloudLogger {
     }
 
     /**
-     * Sends a message to the connected mobile device
+     * Sends message to the phone that's connected.
      */
     public void sendScoreToCloud(final String gameMode) {
         //System.out.println("SENDING score null");
@@ -109,6 +117,9 @@ public class CloudLogger {
         }
     }
 
+    /**
+     * Sends message to the phone that's connected.
+     */
     public void sendProgressToPhone(final String direction, int progress) {
         //System.out.println("SENDING PROGRESS null");
         final byte[] progressByte = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(progress).array();
@@ -125,22 +136,12 @@ public class CloudLogger {
         }
     }
 
+    /**
+     * Returns a boolean indicating if a connection has been
+     * established with the phone.
+     * @return connected
+     */
     public boolean isConnected(){
         return connected;
-    }
-
-    private byte[] convertToBytes(Object object) throws IOException {
-        try (ByteArrayOutputStream bos = new ByteArrayOutputStream();
-             ObjectOutput out = new ObjectOutputStream(bos)) {
-            out.writeObject(object);
-            return bos.toByteArray();
-        }
-    }
-
-    private Object convertFromBytes(byte[] bytes) throws IOException, ClassNotFoundException {
-        try (ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
-             ObjectInput in = new ObjectInputStream(bis)) {
-            return in.readObject();
-        }
     }
 }

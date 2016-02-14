@@ -22,6 +22,11 @@ public class DirectionHelper {
         verticalHistory = new ArrayList<Double>();
     }
 
+    /**
+     * Boolean method. Checks to see whether or not the user is currently
+     * going up.
+     * @return boolean
+     */
     public boolean goingUp(){
         highestCurrentAverage = 0;
         upSum = 0;
@@ -36,6 +41,11 @@ public class DirectionHelper {
         return upSum < -0.05;
     }
 
+    /**
+     * Boolean method. Checks to see whether or not the user is currently
+     * going down.
+     * @return boolean
+     */
     public boolean goingDown(){
         highestCurrentAverage = 0;
         downSum = 0;
@@ -49,6 +59,11 @@ public class DirectionHelper {
         return downSum > 0.05;
     }
 
+    /**
+     * Boolean method. Checks to see whether or not the user is currently
+     * going right.
+     * @return boolean
+     */
     public boolean goingRight() {
         highestCurrentAverage = 0;
         rightSum = 0;
@@ -62,6 +77,11 @@ public class DirectionHelper {
         return rightSum < -0.05;
     }
 
+    /**
+     * Boolean method. Checks to see whether or not the user is currently
+     * going left.
+     * @return boolean
+     */
     public boolean goingLeft() {
         leftSum = 0;
         highestCurrentAverage = 0;
@@ -75,13 +95,30 @@ public class DirectionHelper {
         return leftSum > 0.05;
     }
 
+    /**
+     * Adds the current accelerometer value to a list
+     * to maintain a history of horizontal values.
+     * @param currentValue
+     */
     public void addToHorizontalHistory(double currentValue){
         horizontalHistory.add(currentValue);
     }
+
+    /**
+     * Adds the current accelerometer value to a list
+     * to maintain a history of vertical values.
+     * @param currentValue
+     */
     public void addToVerticalHistory(double currentValue){
         verticalHistory.add(currentValue);
     }
 
+    /**
+     * Takes in a list and returns the last 5 values
+     * of that list.
+     * @param currentList
+     * @return List<Double>
+     */
     private List<Double> getLastValues(List<Double> currentList){
         if (currentList.size() > 5) {
             int index = currentList.size();
@@ -90,6 +127,12 @@ public class DirectionHelper {
         else{return currentList;}
     }
 
+    /**
+     * Takes in the list of 5 values and returns
+     * a returns the average as a double.
+     * @param currentList
+     * @return double
+     */
     private double getAverageFromList(List<Double> currentList){
         double avg = 0;
         if (!currentList.isEmpty()) {
@@ -101,6 +144,11 @@ public class DirectionHelper {
         return avg;
     }
 
+    /**
+     * Checks to see if the current average is greater
+     * than the current highest.
+     * @param currentAverage
+     */
     private void calculateCurrentAverage(double currentAverage){
         double currentAvg = Math.abs(currentAverage);
 
@@ -108,9 +156,30 @@ public class DirectionHelper {
             highestCurrentAverage = currentAvg;
         }
     }
+
+    /**
+     * Get current up motion average.
+     * @return double
+     */
     public double getUpAverage(){ return upSum;}
+    /**
+     * Get current down motion average.
+     * @return double
+     */
     public double getDownAverage(){ return downSum;}
+    /**
+     * Get current right motion average.
+     * @return double
+     */
     public double getRightAverage(){ return rightSum;}
+    /**
+     * Get current left motion average.
+     * @return double
+     */
     public double getLeftAverage(){ return leftSum;}
+    /**
+     * Get current highest average.
+     * @return double
+     */
     public double getHighestCurrentAverage(){ return highestCurrentAverage;}
 }

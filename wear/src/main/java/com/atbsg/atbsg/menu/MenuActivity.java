@@ -102,17 +102,26 @@ public class MenuActivity extends Activity implements WearableListView.ClickList
         listView.setClickListener(this);
     }
 
+    /**
+     * Start calibration activity
+     */
     public void startGameActivity() {
         Intent intent = new Intent(this, CalibrationActivity.class);
         startActivity(intent);
     }
 
+    /**
+     * Start the how to play screen
+     */
     public void startHowActivity() {
         Intent intent = new Intent(this, HowActivity.class);
         cloudLogger.sendScoreToCloud("To play this game, strap the watch firmly on your wrist and follow the directions on screen. You can swipe right to move back a screen.");
         startActivity(intent);
     }
 
+    /**
+     * Start the show unique I.D. screen
+     */
     public void startUniqueActivity() {
         Bundle b=new Bundle();
         b.putBoolean("unique", true);
@@ -129,6 +138,10 @@ public class MenuActivity extends Activity implements WearableListView.ClickList
         intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, "com.aroundbodygame.stroke.aroundthebodystrokegame.menu");
         sr.startListening(intent);
     }
+
+    /**
+     * Start the show progress(scores) activity.
+     */
     public void startProgressActivity() {
         Bundle b = new Bundle();
         b.putStringArray("listItems", new String[]{"Easy High Score: " + logger.getEasyScore(),
@@ -149,11 +162,15 @@ public class MenuActivity extends Activity implements WearableListView.ClickList
        /* Intent intent = new Intent(this, ProgressActivity.class);
         startActivity(intent);*/
     }
+
     public void startSensorActivity() {
         Intent intent = new Intent(this, SensorMenuActivity.class);
         startActivity(intent);
     }
 
+    /**
+     * Start a game on the watch.
+     */
     public void startGameModeActivity(int horizontalMax, int verticalMax) {
         Intent i = new Intent(this, SensorActivity.class);
         i.putExtra("horizontalMax", horizontalMax);
@@ -161,11 +178,18 @@ public class MenuActivity extends Activity implements WearableListView.ClickList
         startActivity(i);
     }
 
+    /**
+     * Start the game on the connected phone.
+     */
     public void startPhoneGameActivity() {
         Intent i = new Intent(this, PhoneGameActivity.class);
         startActivity(i);
     }
 
+    /**
+     * Speak on the phone.
+     * @param speech
+     */
     public void speakOnPhone(String speech){
         cloudLogger.sendScoreToCloud(speech);
     }
@@ -179,6 +203,10 @@ public class MenuActivity extends Activity implements WearableListView.ClickList
         super.onDestroy();
     }
 
+    /**
+     * Check which list item has been clicked.
+     * @param viewHolder
+     */
     @Override
     public void onClick(WearableListView.ViewHolder viewHolder) {
 
@@ -232,6 +260,9 @@ public class MenuActivity extends Activity implements WearableListView.ClickList
 
     }
 
+    /**
+     * Custom adapter for the list.
+     */
     private static final class Adapter extends WearableListView.Adapter {
         private String[] mDataset;
         private final Context mContext;
@@ -379,6 +410,9 @@ public class MenuActivity extends Activity implements WearableListView.ClickList
         }*/
     }
 
+    /**
+     * Service connection that listens out for voice commands.
+     */
     private final ServiceConnection mServiceConnection = new ServiceConnection()
     {
         @Override

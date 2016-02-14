@@ -36,6 +36,12 @@ public class PhoneGameActivity extends WearableActivity {
         });
     }
 
+    /**
+     * Sends the current progress to the phone for
+     * use during the circle game.
+     * @param values
+     * @param progress
+     */
     public void sendToPhone(String values, int progress){
         cloudLogger.sendProgressToPhone(values, progress);
     }
@@ -62,8 +68,12 @@ public class PhoneGameActivity extends WearableActivity {
 
     }
 
+    /**
+     * Activity onDestroy, unregisters the sensor listener
+     */
     @Override
     protected void onDestroy() {
+        //Tells the phone to exit the circle game.
         cloudLogger.sendScoreToCloud("4");
         sensorListener.unregister();
         finish();

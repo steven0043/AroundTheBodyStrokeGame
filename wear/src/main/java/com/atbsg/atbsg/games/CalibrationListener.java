@@ -28,6 +28,11 @@ public class CalibrationListener implements SensorEventListener {
         mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_UI);
     }
 
+    /**
+     * Implemented method, gets called every time the
+     * registered accelerometer sensor is changed.
+     * @param event
+     */
     @Override
     public void onSensorChanged(SensorEvent event) {
 
@@ -42,6 +47,12 @@ public class CalibrationListener implements SensorEventListener {
         }
     }
 
+    /**
+     * Checks to see if the user is holding the watch
+     * face parallel to their own by checking the
+     * current 'y' value.
+     * @param yAcc
+     */
     private void checkCalibration(float yAcc){
         if(yAcc > 8){
             holdTime = holdTime + 90;
@@ -64,6 +75,9 @@ public class CalibrationListener implements SensorEventListener {
 
     }
 
+    /**
+     * Unregisters the accelerometer from the sensor manager.
+     */
     public void unregister() {
         System.out.println("DESTROOOYYYEDD");
         mSensorManager.unregisterListener(this);

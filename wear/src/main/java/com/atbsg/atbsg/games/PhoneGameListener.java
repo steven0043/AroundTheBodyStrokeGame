@@ -31,6 +31,11 @@ public class PhoneGameListener implements SensorEventListener {
         mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_UI);
     }
 
+    /**
+     * Implemented method, gets called every time the
+     * registered accelerometer sensor is changed.
+     * @param event
+     */
     @Override
     public void onSensorChanged(SensorEvent event) {
 
@@ -61,6 +66,10 @@ public class PhoneGameListener implements SensorEventListener {
         }
     }
 
+    /**
+     * Isolate and remove gravity from the sensor events values.
+     * @param event
+     */
     public void removeGravity(SensorEvent event){
         // Isolate the force of gravity with the low-pass filter.
         gravity[0] = alpha * gravity[0] + (1 - alpha) * event.values[0];
@@ -73,6 +82,10 @@ public class PhoneGameListener implements SensorEventListener {
         linear_acceleration[2] = event.values[2] - gravity[2];
     }
 
+    /**
+     * Add the current sensor values to a list of historical values
+     * based on the current direction required by the game mode.
+     */
     public void addToAverages(){
         if(currentPhoneMotion.equals("LEFT") || currentPhoneMotion.equals("RIGHT")){
             directionHelper.addToHorizontalHistory(linear_acceleration[0] * 2);
@@ -82,33 +95,54 @@ public class PhoneGameListener implements SensorEventListener {
         }
     }
 
+    /**
+     * Check if user is moving their arm up.
+     * @return boolean
+     */
     public boolean goingUp(){
         return linear_acceleration[2] < -0.25 && currentPhoneMotion.equals("UP") &&
                 directionHelper.goingUp();
     }
 
+    /**
+     * Apply the up weighting to the current progress value.
+     */
     public void applyUpWeighting(){
         if(mProgressStatus < verticalMax && mProgressStatus >= 0) {
             mProgressStatus = (int) (mProgressStatus + (((-linear_acceleration[2]+ 1)*2) * (((-directionHelper.getUpAverage())) * (16-((directionHelper.getHighestCurrentAverage()/3)*4)))));
         }
     }
 
+    /**
+     * Check if user is moving their arm down.
+     * @return boolean
+     */
     public boolean goingDown(){
         return linear_acceleration[2] > 0.25 && currentPhoneMotion.equals("DOWN")
                 && directionHelper.goingDown();
     }
 
+    /**
+     * Apply the down weighting to the current progress value.
+     */
     public void applyDownWeighting(){
         if(mProgressStatus > 0 && mProgressStatus <= 2000) {
             mProgressStatus = (int) (mProgressStatus - (((linear_acceleration[2]+1)*2) * (((directionHelper.getDownAverage())) * (16-((directionHelper.getHighestCurrentAverage()/3)*4)))));
         }
     }
 
+    /**
+     * Check if user is moving their arm right.
+     * @return boolean
+     */
     public boolean goingRight(){
         return linear_acceleration[0] < -0.005 && currentPhoneMotion.equals("RIGHT")
                 && /*directionHelper.goingRight()*/ directionHelper.goingRight();
     }
 
+    /**
+     * Apply the right weighting to the current progress value.
+     */
     public void applyRightWeighting(){
         if(mProgressStatus < horizontalMax && mProgressStatus >= 0) {
             double highestAvgWeight =  Math.abs(16-((directionHelper.getHighestCurrentAverage()/3)*4));
@@ -118,11 +152,18 @@ public class PhoneGameListener implements SensorEventListener {
         }
     }
 
+    /**
+     * Check if user is moving their arm left.
+     * @return boolean
+     */
     public boolean goingLeft(){
         return linear_acceleration[0] > 0.005 && currentPhoneMotion.equals("LEFT")
                 && directionHelper.goingLeft();
     }
 
+    /**
+     * Apply the left weighting to the current progress value.
+     */
     public void applyLeftWeighting(){
         if(mProgressStatus>horizontalMax){
             mProgressStatus = horizontalMax;
@@ -135,6 +176,9 @@ public class PhoneGameListener implements SensorEventListener {
         }
     }
 
+    /**
+     * Update the game values on the phone.
+     */
     public void updateView(){
         currentActivity.sendToPhone("30"+currentPhoneMotion, mProgressStatus);
     }
@@ -144,11 +188,20 @@ public class PhoneGameListener implements SensorEventListener {
 
     }
 
+    /**
+     * Receives the current direction from the phone and
+     * assigns it to our class variable.
+     * @param direction
+     */
     public static void setPhoneDirection(String direction){
         currentPhoneMotion = direction;
         reset();
     }
 
+    /**
+     * Reset the progress values based on the direction
+     * we have changed to.
+     */
     public static void reset(){
         if(currentPhoneMotion.equals("DOWN")){
             mProgressStatus = 2000;
@@ -161,6 +214,9 @@ public class PhoneGameListener implements SensorEventListener {
         }
     }
 
+    /**
+     * Unregisters the accelerometer from the sensor manager.
+     */
     public void unregister() {
         //playSound("Your final score is " + score);
         System.out.println("DESTROOOYYYEDD");

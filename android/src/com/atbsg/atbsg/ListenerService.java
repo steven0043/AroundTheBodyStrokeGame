@@ -23,6 +23,10 @@ public class ListenerService extends WearableListenerService {
             "options are: how to play, game modes, my progress and settings";
     boolean scoreAdded = false;
 
+    /**
+     * Method that receives messages from the watch.
+     * @param messageEvent
+     */
     @Override
     public void onMessageReceived(MessageEvent messageEvent) {
         try {
@@ -77,6 +81,10 @@ public class ListenerService extends WearableListenerService {
         }
     }
 
+    /**
+     * Posts score to the MySQL table.
+     * @param message
+     */
     private void addScore(String message) {
         String[] splitMessage = message.split(" ");
         if(splitMessage.length==3) {
@@ -100,6 +108,11 @@ public class ListenerService extends WearableListenerService {
         }
     }
 
+    /**
+     * Takes in the sound to be spoken as a String,
+     * and it's spoken through the phone.
+     * @param sound
+     */
     private void soundChecker(String sound){
         if(sound.equals(UP_SOUND)){
             //playUpSound();

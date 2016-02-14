@@ -75,12 +75,22 @@ public class SensorActivity extends WearableActivity  {
         });
     }
 
+    /**
+     * Updates the text view with the direction and current score.
+     * @param directions
+     * @param score
+     */
     protected void setmTextView(ArrayList<String> directions, int score) {
         mTextView.setText("");
         mTextView.setText(directions.get(0) + " | " + score);
        //mProgress.setVisibility(View.INVISIBLE);
     }
 
+    /**
+     * Takes in the current progress value and updates the current
+     * visible dialog to reflect it.
+     * @param mProgressStatus
+     */
     protected void updateProgressBar(int mProgressStatus){
         final int mProgressStatuss = mProgressStatus;
 
@@ -103,36 +113,55 @@ public class SensorActivity extends WearableActivity  {
 
     }
 
-    protected void updateHorizontalProgressBar(int mProgressStatus){
-        if (textBool == true) {
-            mProgressHorizontal.setProgress(mProgressStatus);
-        }
-    }
-
+    /**
+     * Makes the vertical progress bar visible.
+     */
     protected void makeVerticalVisible(){
         mProgress.setVisibility(View.VISIBLE);
     }
 
+    /**
+     * Makes the horizontal progress bar visible.
+     */
     protected void makeHorizontalVisible(){
         mProgressHorizontal.setVisibility(View.VISIBLE);
     }
 
+    /**
+     * Makes the vertical progress bar invisible.
+     */
     protected void makeVerticalInvisible(){
         mProgress.setVisibility(View.INVISIBLE);
     }
 
+    /**
+     * Makes the horizontal progress bar visible.
+     */
     protected void makeHorizontalInvisible(){
         mProgressHorizontal.setVisibility(View.INVISIBLE);
     }
 
+    /**
+     * Send the current score to the phone
+     * @param score
+     */
     public void addScoreToCloud(String score){
         cloudLogger.sendScoreToCloud(score);
     }
 
+    /**
+     * Send the current progress value to the phone.
+     * @param direction
+     * @param score
+     */
     public void addProgressToPhone(String direction, int score){
         cloudLogger.sendProgressToPhone(direction, score);
     }
 
+    /**
+     * Indicate to the phone which game mode is currently
+     * being played.
+     */
     public void declareGameModeToPhone(){
         if(verticalMax == 2000){
            addScoreToCloud("2EASY");
@@ -145,6 +174,10 @@ public class SensorActivity extends WearableActivity  {
         }
     }
 
+    /**
+     * Handler that is called until the
+     * phone is notified of the game mode.
+     */
     public void updatePhoneMaximums(){
         Handler handler = new Handler();
         Runnable r=new Runnable() {
@@ -170,6 +203,9 @@ public class SensorActivity extends WearableActivity  {
         super.onPause();
     }
 
+    /**
+     * Activity onDestroy, unregisters the sensor listener
+     */
     @Override
     protected void onDestroy() {
         sensorListener.unregister();
