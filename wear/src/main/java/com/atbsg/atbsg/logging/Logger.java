@@ -23,6 +23,8 @@ public class Logger {
     final static String hardKey = "hardScore";
     final static String uniqueId = "uniqueId";
     final static String openKey = "openedTimes";
+    final static String userArrayKey = "userArray";
+    final static String currentUserKey = "currentUser";
 
     public Logger(Activity acc) {
         prefs = acc.getSharedPreferences(
@@ -39,7 +41,7 @@ public class Logger {
      */
     public int getEasyScore() {
 
-        int easyScore = prefs.getInt(easyKey, 0);
+        int easyScore = prefs.getInt(easyKey+this.getUniqueId(), 0);
 
         return easyScore;
 
@@ -50,7 +52,7 @@ public class Logger {
      * @return int
      */
     public int getLastEasyScore() {
-        int easyScore = prefs.getInt(lastEasyKey, 0);
+        int easyScore = prefs.getInt(lastEasyKey+this.getUniqueId(), 0);
 
         return easyScore;
 
@@ -62,7 +64,7 @@ public class Logger {
      */
     public int getLastMediumScore() {
 
-        int mediumScore = prefs.getInt(lastMediumKey, 0);
+        int mediumScore = prefs.getInt(lastMediumKey+this.getUniqueId(), 0);
 
         return mediumScore;
 
@@ -74,7 +76,7 @@ public class Logger {
      */
     public int getLastHardScore() {
 
-        int hardScore = prefs.getInt(lastHardKey, 0);
+        int hardScore = prefs.getInt(lastHardKey+this.getUniqueId(), 0);
 
         return hardScore;
 
@@ -86,7 +88,7 @@ public class Logger {
      */
     public int getMediumScore() {
 
-        int mediumScore = prefs.getInt(mediumKey, 0);
+        int mediumScore = prefs.getInt(mediumKey+this.getUniqueId(), 0);
 
         return mediumScore;
 
@@ -97,7 +99,7 @@ public class Logger {
      * @return int
      */
     public int getHardScore() {
-        int hardScore = prefs.getInt(hardKey, 0);
+        int hardScore = prefs.getInt(hardKey+this.getUniqueId(), 0);
 
         return hardScore;
     }
@@ -107,7 +109,7 @@ public class Logger {
      * @return String
      */
     public String getUniqueId() {
-        String id = prefs.getString(uniqueId, "");
+        String id = prefs.getString(currentUserKey, "");
 
         return id;
     }
@@ -118,7 +120,7 @@ public class Logger {
      */
     public int getOpened() {
 
-        int opened = prefs.getInt(openKey, 0);
+        int opened = prefs.getInt(openKey + this.getUniqueId(), 0);
 
         return opened;
 
@@ -130,7 +132,7 @@ public class Logger {
      * @param easyScore
      */
     public void setEasyScore(int easyScore){
-        prefs.edit().putInt(easyKey, easyScore).apply();
+        prefs.edit().putInt(easyKey+this.getUniqueId(), easyScore).apply();
     }
 
     /**
@@ -140,7 +142,7 @@ public class Logger {
      */
     public void setLastEasyScore(int easyScore){
         cloudLogger.sendScoreToCloud("easy " + easyScore + " " + this.getUniqueId());
-        prefs.edit().putInt(lastEasyKey, easyScore).apply();
+        prefs.edit().putInt(lastEasyKey+this.getUniqueId(), easyScore).apply();
     }
 
     /**
@@ -150,7 +152,7 @@ public class Logger {
      */
     public void setLastMediumScore(int mediumScore){
         cloudLogger.sendScoreToCloud("medium " + mediumScore + " " + this.getUniqueId());
-        prefs.edit().putInt(lastMediumKey, mediumScore).apply();
+        prefs.edit().putInt(lastMediumKey+this.getUniqueId(), mediumScore).apply();
     }
 
     /**
@@ -160,7 +162,7 @@ public class Logger {
      */
     public void setLastHardScore(int hardScore){
         cloudLogger.sendScoreToCloud("hard " + hardScore + " " + this.getUniqueId());
-        prefs.edit().putInt(lastHardKey, hardScore).apply();
+        prefs.edit().putInt(lastHardKey+this.getUniqueId(), hardScore).apply();
     }
 
     /**
@@ -169,7 +171,7 @@ public class Logger {
      * @param mediumScore
      */
     public void setMediumScore(int mediumScore){
-        prefs.edit().putInt(mediumKey, mediumScore).apply();
+        prefs.edit().putInt(mediumKey+this.getUniqueId(), mediumScore).apply();
     }
 
     /**
@@ -178,7 +180,7 @@ public class Logger {
      * @param hardScore
      */
     public void setHardScore(int hardScore){
-        prefs.edit().putInt(hardKey, hardScore).apply();
+        prefs.edit().putInt(hardKey+this.getUniqueId(), hardScore).apply();
     }
 
     /**
@@ -187,7 +189,16 @@ public class Logger {
      */
     public void setUniqueId(){
         String id = generateUnique(6);
-        prefs.edit().putString(uniqueId, id).apply();
+        prefs.edit().putString(uniqueId+this.getUniqueId(), id).apply();
+        saveUserArray(id);
+    }
+
+    public void setCurrentUser(String uniqueId){
+        prefs.edit().putString(currentUserKey, uniqueId).apply();
+    }
+
+    public String getCurrentUser(){
+        return prefs.getString(currentUserKey, "");
     }
 
     /**
@@ -195,7 +206,7 @@ public class Logger {
      * @param opened
      */
     public void setOpened(int opened){
-        prefs.edit().putInt(openKey, opened).commit();
+        prefs.edit().putInt(openKey+this.getUniqueId(), opened).commit();
     }
 
     /**
@@ -203,12 +214,38 @@ public class Logger {
      * @param len
      * @return String
      */
-    private String generateUnique(int len){
+    public String generateUnique(int len){
         final String AB = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         Random rnd = new Random();
         StringBuilder sb = new StringBuilder( len );
         for( int i = 0; i < len; i++ )
             sb.append( AB.charAt( rnd.nextInt(AB.length()) ) );
         return sb.toString();
+    }
+
+    public boolean saveUserArray(String newUser) {
+        String[] array = loadUserArray();
+        String[] newUserArray;
+        if(array == null || array.length ==0){
+            newUserArray = new String[]{newUser};
+        }else{
+            newUserArray = new String[array.length+1];
+            for(int i = 0; i< newUserArray.length-1; i++){
+                newUserArray[i] = array[i];
+            }
+            newUserArray[newUserArray.length-1] = newUser;}
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putInt(userArrayKey +"_size", newUserArray.length);
+        for(int i=0;i<newUserArray.length;i++)
+            editor.putString(userArrayKey + "_" + i, newUserArray[i]);
+        return editor.commit();
+    }
+
+    public String[] loadUserArray() {
+        int size = prefs.getInt(userArrayKey + "_size", 0);
+        String array[] = new String[size];
+        for(int i=0;i<size;i++)
+            array[i] = prefs.getString(userArrayKey + "_" + i, null);
+        return array;
     }
 }

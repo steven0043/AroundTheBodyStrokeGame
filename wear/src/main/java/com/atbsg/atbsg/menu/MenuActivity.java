@@ -18,7 +18,6 @@ import android.speech.SpeechRecognizer;
 import android.support.wearable.view.WearableListView;
 import android.util.Log;
 import android.view.View;
-import java.util.List;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.ListView;
@@ -30,23 +29,20 @@ import com.atbsg.atbsg.games.SensorActivity;
 import com.atbsg.atbsg.how.HowActivity;
 import com.atbsg.atbsg.logging.CloudLogger;
 import com.atbsg.atbsg.logging.Logger;
-import com.atbsg.atbsg.menu.SensorMenuActivity;
-import com.atbsg.atbsg.menu.VoiceService;
-import com.atbsg.atbsg.how.HowActivity;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class MenuActivity extends Activity implements WearableListView.ClickListener {
 
     private ListView lv;
-    List<String> menu_list = new ArrayList<String>(Arrays.asList("How To Play", "Game Modes", "My Progress", "Sensor Data"));
     String[] elements = {"How To Play", "Game Modes", "My Progress", "Settings", "Sensor Data", "Play Game"};
     public static Logger logger;
     private static final String START_SPEECH = "Welcome to the around the body stroke recovery game. Your starting " +
             "options are: how to play, game modes, my progress and settings";
     boolean gameMenu = false;
     boolean scoreMenu = false;
+    boolean settingsMenu = false;
+    boolean viewUsersMenu = false;
     public CloudLogger cloudLogger;
     private int mBindFlag;
     private Messenger mServiceMessenger;
@@ -66,21 +62,28 @@ public class MenuActivity extends Activity implements WearableListView.ClickList
         //displaySpeechRecognizer();
         //startService();
 
+        cloudLogger = new CloudLogger(this);
         if(b!=null){
             String[] array=b.getStringArray("listItems");
             boolean voiced = b.getBoolean("voiced");
             elements = array;
             if(elements[0].startsWith("Easy High")){
                 scoreMenu = true;
-            }else {
+            }else if(elements[0].equals("Easy")){
                 gameMenu = true;
+            }else if(elements[0].startsWith("Your")){
+                settingsMenu = true;
+            }else{
+                viewUsersMenu = true;
             }
             if(voiced) {
                 voiceDelayThenFinish();
             }
         }else{
             if(logger.getUniqueId().equals("")){
-                logger.setUniqueId();
+                String uniqueId = logger.generateUnique(6);
+                logger.saveUserArray(uniqueId);
+                logger.setCurrentUser(uniqueId);
             }else{
                 logger.setOpened(logger.getOpened()+1);
             }
@@ -122,7 +125,24 @@ public class MenuActivity extends Activity implements WearableListView.ClickList
     /**
      * Start the show unique I.D. screen
      */
-    public void startUniqueActivity() {
+    public void startSettingsActivity() {
+        Bundle b = new Bundle();
+        b.putStringArray("listItems", new String[]{"Your Unique I.D.", "Change User", "Create New User"});
+        Intent intent = new Intent(this, MenuActivity.class);
+        intent.putExtras(b);
+        startActivity(intent);
+    }
+
+    public void startChangeUserActivity() {
+        Bundle b = new Bundle();
+        b.putStringArray("listItems", logger.loadUserArray());
+        Intent intent = new Intent(this, MenuActivity.class);
+        intent.putExtras(b);
+        startActivity(intent);
+    }
+
+
+    public void viewUniqueActivity(){
         Bundle b=new Bundle();
         b.putBoolean("unique", true);
         Intent intent = new Intent(this, HowActivity.class);
@@ -130,6 +150,7 @@ public class MenuActivity extends Activity implements WearableListView.ClickList
         cloudLogger.sendScoreToCloud("Your unique I.D. is " + logger.getUniqueId() + ". Your physiotherapist can view your progress via the web service using this I.D.");
         startActivity(intent);
     }
+
 
     public void listenOut(){
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
@@ -196,7 +217,7 @@ public class MenuActivity extends Activity implements WearableListView.ClickList
 
     @Override
     protected void onDestroy() {
-        if(!gameMenu && !scoreMenu) {
+        if(!gameMenu && !scoreMenu && !viewUsersMenu && !settingsMenu) {
             android.os.Process.killProcess(android.os.Process.myPid());
             System.exit(0);
         }
@@ -211,7 +232,9 @@ public class MenuActivity extends Activity implements WearableListView.ClickList
     public void onClick(WearableListView.ViewHolder viewHolder) {
 
         Integer tag = (Integer) viewHolder.itemView.getTag();
-        if(!gameMenu && !scoreMenu) {
+        String text = (String) viewHolder.itemView.getTag(tag);
+        System.out.println("Text " + text);
+        if(!gameMenu && !scoreMenu && !viewUsersMenu && !settingsMenu) {
             if (tag == 0) {
                 startHowActivity();
             }
@@ -222,7 +245,7 @@ public class MenuActivity extends Activity implements WearableListView.ClickList
                 startProgressActivity();
             }
             if (tag == 3) {
-                startUniqueActivity();
+                startSettingsActivity();
             }
             if (tag == 4) {
                 startSensorActivity();
@@ -241,6 +264,21 @@ public class MenuActivity extends Activity implements WearableListView.ClickList
             if (tag == 2) {
                 startGameModeActivity(4000, 8000);
             }
+        }
+        if(settingsMenu && !scoreMenu && !gameMenu && !viewUsersMenu) {
+            if (tag == 0) {
+                viewUniqueActivity();
+            }
+            if (tag == 1) {
+                startChangeUserActivity();
+            }
+            if (tag == 2) {
+                logger.saveUserArray(logger.generateUnique(6));
+            }
+        }
+        if(viewUsersMenu && !settingsMenu && !scoreMenu && !gameMenu) {
+            String[] array = logger.loadUserArray();
+            logger.setCurrentUser(array[tag]);
         }
     }
 
@@ -365,7 +403,7 @@ public class MenuActivity extends Activity implements WearableListView.ClickList
                 startProgressActivity();
             }
             if(data.get(0).contains("settings")){
-                startUniqueActivity();
+                startSettingsActivity();
             }
             if(data.get(0).contains("sensor")){
                 startSensorActivity();
