@@ -5,6 +5,7 @@ package com.atbsg.atbsg;
  */
 
 import android.content.Intent;
+import android.os.Bundle;
 
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.WearableListenerService;
@@ -15,13 +16,8 @@ import java.util.Date;
 
 
 public class ListenerService extends WearableListenerService {
-    private static final String UP_SOUND = "UP";
-    private static final String DOWN_SOUND = "DOWN";
-    private static final String LEFT_SOUND = "LEFT";
-    private static final String RIGHT_SOUND = "RIGHT";
-    private static final String START_SPEECH = "Welcome to the around the body stroke recovery game. Your starting " +
-            "options are: how to play, game modes, my progress and settings";
     boolean scoreAdded = false;
+    String userId = "no id";
 
     /**
      * Method that receives messages from the watch.
@@ -35,11 +31,11 @@ public class ListenerService extends WearableListenerService {
             int progress = 0;
             addScore(messageEvent.getPath());
             if (!scoreAdded && messageEvent.getPath().startsWith("1")) {
-                progress = ByteBuffer.wrap(messageEvent.getData()).order(ByteOrder.LITTLE_ENDIAN).getInt();
-                direction = messageEvent.getPath().substring(1);
+                progress = ByteBuffer.wrap(messageEvent.getData()).order(ByteOrder.LITTLE_ENDIAN).getInt(); // Byte array to integer
+                direction = messageEvent.getPath().substring(1); //Get direction
                 String score = direction.replaceAll("\\D+","");
                 direction = direction.replaceAll("\\d","");
-                MainActivity.updateProgressBar(direction, score, progress);
+                MainActivity.updateProgressBar(direction, score, progress); //Update the UI
             }
             else if (!scoreAdded && messageEvent.getPath().startsWith("2")) {
                 System.out.println("MODE " + messageEvent.getPath());
@@ -69,6 +65,11 @@ public class ListenerService extends WearableListenerService {
                 }
             }
             else if (!scoreAdded && messageEvent.getPath().startsWith("4")) {
+               /* Intent intent = new Intent("close");
+                Bundle b=new Bundle();
+                b.putString("userId", userId);
+                intent.putExtras(b);
+                getApplicationContext().sendBroadcast(intent);*/
                 sendBroadcast(new Intent("close"));
             }
             else{
@@ -89,12 +90,14 @@ public class ListenerService extends WearableListenerService {
         String[] splitMessage = message.split(" ");
         if(splitMessage.length==3) {
             String mode = splitMessage[0];
-            System.out.println("mode is " + mode );
+            System.out.println("mode is " + mode);
             int score = Integer.parseInt(splitMessage[1]);
-            String userId = splitMessage[2];
+            userId = splitMessage[2];
+
+            MainActivity.setUserId(userId);
             scoreAdded = true;
             if (mode.contains("easy")) {
-                System.out.println("Adding easy" );
+                System.out.println("Adding easy");
                 new ScorePoster().execute(userId, Integer.toString(score), new Date().toString(), "Easy");
             }
             if (mode.contains("medium")) {
@@ -114,28 +117,7 @@ public class ListenerService extends WearableListenerService {
      * @param sound
      */
     private void soundChecker(String sound){
-        if(sound.equals(UP_SOUND)){
-            //playUpSound();
-            MainActivity.speak(UP_SOUND);
-        }
-        else if(sound.equals(DOWN_SOUND)){
-            //playDownSound();
-            MainActivity.speak(DOWN_SOUND);
-        }
-        else if(sound.equals(LEFT_SOUND)){
-            //playLeftSound();
-            MainActivity.speak(LEFT_SOUND);
-        }
-        else if(sound.equals(RIGHT_SOUND)){
-            //playRightSound();
-            MainActivity.speak(RIGHT_SOUND);
-        }
-        else if(sound.equals(START_SPEECH)){
-            MainActivity.speak(START_SPEECH);
-        }
-        else{
-            MainActivity.speak(sound);
-        }
+        MainActivity.speak(sound);
     }
 
     private boolean isDirectionVertical(String message){

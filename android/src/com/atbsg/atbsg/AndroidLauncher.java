@@ -20,6 +20,7 @@ public class AndroidLauncher extends AndroidApplication implements ActionResolve
 	TextToSpeech t1;
 	Logger logger;
 	private int currentGameScore = 0;
+	private String userId = "no id";
 
 	public AndroidLauncher(){
 
@@ -157,7 +158,7 @@ public class AndroidLauncher extends AndroidApplication implements ActionResolve
 
 	@Override
 	protected void onDestroy () {
-		new ScorePoster().execute("QSV46T", Integer.toString(currentGameScore), new Date().toString(), "Game");
+		new ScorePoster().execute(MainActivity.getUserId(), Integer.toString(currentGameScore), new Date().toString(), "Game");
 		unregisterReceiver(closeGame);
 		super.onDestroy();
 	}
@@ -169,6 +170,7 @@ public class AndroidLauncher extends AndroidApplication implements ActionResolve
 	private final BroadcastReceiver closeGame = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
+			System.out.println("BROADCAST");
 			finish();
 		}
 	};

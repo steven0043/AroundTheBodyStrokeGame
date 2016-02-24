@@ -8,4 +8,10 @@
     <item android:id="@+id/game"
         android:titleCondensed="Play Game"
         android:title="Play Game"/>
+    <item android:id="@+id/webService"
+        android:titleCondensed="Open Web Service"
+        android:title="Open Web Service"/>
+    <item android:id="@+id/userTasks"
+        android:titleCondensed="User Tasks"
+        android:title="User Tasks"/>
 </menu>

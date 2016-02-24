@@ -74,7 +74,7 @@ public class DirectionHelper {
 
         calculateCurrentAverage(rightSum);
 
-        return rightSum < -0.05;
+        return rightSum < -0.005;
     }
 
     /**
@@ -92,7 +92,7 @@ public class DirectionHelper {
 
         calculateCurrentAverage(leftSum);
 
-        return leftSum > 0.05;
+        return leftSum > 0.005;
     }
 
     /**

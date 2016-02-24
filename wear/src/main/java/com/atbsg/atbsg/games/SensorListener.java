@@ -153,8 +153,8 @@ public class SensorListener implements SensorEventListener {
         if(mProgressStatus < horizontalMax) {
             double highestAvgWeight =  toPositive(16 - ((directionHelper.getHighestCurrentAverage() / 3) * 4));
             double currentAvgWeight = toPositive(-directionHelper.getRightAverage());
-            double currentValueWeight = toPositive(((-linear_acceleration[2] + 1) * 2));
-            mProgressStatus = (int) (mProgressStatus + (currentAvgWeight * (currentAvgWeight* highestAvgWeight)));
+            double currentValueWeight = toPositive(((-linear_acceleration[2] + 1) * 2) + (1/-directionHelper.getRightAverage()));
+            mProgressStatus = (int) (mProgressStatus + (currentAvgWeight * (currentAvgWeight * highestAvgWeight )));
         }else {
             direction = "RIGHT";
             moved = true;
@@ -193,7 +193,7 @@ public class SensorListener implements SensorEventListener {
      * @return boolean
      */
     private boolean goingRight(){
-        return linear_acceleration[0] < -0.05 && gameHelper.isRight()
+        return linear_acceleration[0] < -0.005 && gameHelper.isRight()
                 && directionHelper.goingRight();
     }
 

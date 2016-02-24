@@ -28,6 +28,7 @@ public class GameScreen implements Screen {
     Sound scoreSound;
     boolean updateBool = false;
     boolean spoken = false;
+    boolean moved = false;
     BitmapFont font;
     ArrayList<Texture> circleArray;
     int recKeeper[] = new int[] {200, 150, 100, 75};
@@ -50,7 +51,7 @@ public class GameScreen implements Screen {
                 Gdx.files.internal("sptfnt.png"), false);
         display = "UP";
         circle = new Texture(Gdx.files.internal("circle.png"));
-        speak("Follow the directions on screen and try to get the ball inside the circle!");
+        speak("Follow the directions on screen and try to get the ball inside the circle, once inside the circle try to keep it there for 2 seconds.");
     }
 
     /**
@@ -80,7 +81,8 @@ public class GameScreen implements Screen {
         game.batch.begin();
         font.draw(game.batch, "" + score, 50, 1035);
         font.draw(game.batch, display, 340, 1035);
-        game.batch.draw(circleArray.get(img), hole1.x, hole1.y);
+        if(!(gameDirections.get(counter).equals("LEFT") || gameDirections.get(counter).equals("RIGHT"))) {
+        game.batch.draw(circleArray.get(img), hole1.x, hole1.y);}
         game.batch.draw(circle, circleRec.x, circleRec.y);
         game.batch.end();
     }
@@ -117,116 +119,19 @@ public class GameScreen implements Screen {
      */
     public void updateRecs() {
         lastUpdateTime = System.currentTimeMillis();
-        if(score%5==0 && score >0 && theCounter <3) {
-            theCounter++;
-            if (counter == 0) {
-                hole1.x = MathUtils.random(200, 740);
-                hole1.y = MathUtils.random(250, 875);
-                hole1.width = recKeeper[theCounter];
-                hole1.height = recKeeper[theCounter];
-                img = theCounter;
-                circleRec.x = hole1.x + ((hole1.width / 2) - 25);
-                updateBool = false;
-            } else if (counter == 1){
-                hole1.x = MathUtils.random(200, 740);
-                hole1.y = MathUtils.random(210, 750);
-                hole1.width = recKeeper[theCounter];
-                hole1.height = recKeeper[theCounter];
-                img = theCounter;
-                circleRec.x = hole1.x + ((hole1.width / 2) - 25);
-                updateBool = false;
-            }else if (counter == 2){
-                hole1.x = MathUtils.random(200, 740);
-                //hole1.y = MathUtils.random(210, 800);
-                hole1.width = recKeeper[theCounter];
-                hole1.height = recKeeper[theCounter];
-                img = theCounter;
-                circleRec.y = hole1.y - (hole1.height);
-                updateBool = false;
-            }
-            else{
-                hole1.x = MathUtils.random(20, 740);
-                //hole1.y = MathUtils.random(210, 800);
-                hole1.width = recKeeper[theCounter];
-                hole1.height = recKeeper[theCounter];
-                img = theCounter;
-                circleRec.y =  hole1.y + ((hole1.height/2)-25);
-                updateBool = false;
-            }
+            if(score % 5 == 0){
+            theCounter++;}
+            hole1.x = MathUtils.random(200, 740);
+            hole1.y = MathUtils.random(250, 775);
+            hole1.width = recKeeper[theCounter];
+            hole1.height = recKeeper[theCounter];
+            img = theCounter;
+            circleRec.x = hole1.x + ((hole1.width / 2) - 25);
+            updateBool = false;
+        if(gameDirections.get(counter).equals("LEFT") || gameDirections.get(counter).equals("RIGHT")) {
+            speak("Please move your arm " + gameDirections.get(counter) + " until the ball is at the other side of the screen");
         }
-        else if(score > 5){
-            if (counter == 0) {
-                hole1.x = MathUtils.random(200, 740);
-                hole1.y = MathUtils.random(250, 875);
-                hole1.width = recKeeper[theCounter];
-                hole1.height = recKeeper[theCounter];
-                img = theCounter;
-                circleRec.x = hole1.x + ((hole1.width / 2) - 25);
-                updateBool = false;
-            }  else if (counter == 1){
-                hole1.x = MathUtils.random(200, 740);
-                hole1.y = MathUtils.random(210, 750);
-                hole1.width = recKeeper[theCounter];
-                hole1.height = recKeeper[theCounter];
-                img = theCounter;
-                circleRec.x = hole1.x + ((hole1.width / 2) - 25);
-                updateBool = false;
-            }else if (counter == 2){
-                hole1.x = MathUtils.random(200, 740);
-                //hole1.y = MathUtils.random(210, 800);
-                hole1.width = recKeeper[theCounter];
-                hole1.height = recKeeper[theCounter];
-                img = theCounter;
-                circleRec.y = hole1.y - (hole1.height);
-                updateBool = false;
-            }
-            else{
-                hole1.x = MathUtils.random(20, 740);
-                //hole1.y = MathUtils.random(210, 800);
-                hole1.width = recKeeper[theCounter];
-                hole1.height = recKeeper[theCounter];
-                img = theCounter;
-                circleRec.y =  hole1.y + ((hole1.height/2)-25);
-                updateBool = false;
-            }
-        }
-        else{
-            if (counter == 0) {
-                hole1.x = MathUtils.random(200, 740);
-                hole1.y = MathUtils.random(250, 875);
-                hole1.width = recKeeper[theCounter];
-                hole1.height = recKeeper[theCounter];
-                img = theCounter;
-                circleRec.x = hole1.x + ((hole1.width / 2) - 25);
-                updateBool = false;
-            } else if (counter == 1){
-                hole1.x = MathUtils.random(200, 740);
-                hole1.y = MathUtils.random(210, 750);
-                hole1.width = recKeeper[theCounter];
-                hole1.height = recKeeper[theCounter];
-                img = theCounter;
-                circleRec.x = hole1.x + ((hole1.width / 2) - 25);
-                updateBool = false;
-            }else if (counter == 2){
-                hole1.x = MathUtils.random(200, 740);
-                //hole1.y = MathUtils.random(210, 800);
-                hole1.width = recKeeper[theCounter];
-                hole1.height = recKeeper[theCounter];
-                img = theCounter;
-                circleRec.y = hole1.y - (hole1.height);
-                updateBool = false;
-            }
-            else{
-                hole1.x = MathUtils.random(20, 740);
-                //hole1.y = MathUtils.random(210, 800);
-                hole1.width = recKeeper[theCounter];
-                hole1.height = recKeeper[theCounter];
-                img = theCounter;
-                circleRec.y =  hole1.y + ((hole1.height/2)-25);
-                updateBool = false;
-            }
-        }
-        speak(gameDirections.get(counter));
+        else{speak(gameDirections.get(counter));}
     }
 
     /**
@@ -236,10 +141,11 @@ public class GameScreen implements Screen {
     public void checkUpDown(){
         if(gameDirections.get(counter).equals("UP") || gameDirections.get(counter).equals("DOWN")) {
             circleRec.y=(game.actionResolver.getVertical()/2);
+            circleRec.x = hole1.x + ((hole1.width / 2) - 25);
             if((curTime - lastUpdate) > 1500) {
                 if (gameDirections.get(counter).equals("UP") && circleRec.y > (hole1.y + (recKeeper[theCounter]-50))) {
                     backgroundColour.red();
-                    score = 0;
+                    //score = 0;
                     counter = 0;
                     game.actionResolver.sendToPhone(gameDirections.get(counter));
                     //updateRecs();
@@ -248,7 +154,7 @@ public class GameScreen implements Screen {
                 }
                 if (gameDirections.get(counter).equals("DOWN") && circleRec.y < (hole1.y)) {
                     backgroundColour.red();
-                    score = 0;
+                    //score = 0;
                     counter = 0;
                     game.actionResolver.sendToPhone(gameDirections.get(counter));
                     //updateRecs();
@@ -265,12 +171,16 @@ public class GameScreen implements Screen {
      */
     public void checkLeftRight(){
         if(gameDirections.get(counter).equals("LEFT") || gameDirections.get(counter).equals("RIGHT")) {
-            circleRec.x=game.actionResolver.getHorizontal();
+            /*if(gameDirections.get(counter).equals("LEFT") && ((curTime - lastUpdate) > 1500)){*/
+                circleRec.x=game.actionResolver.getHorizontal();
+            /*}else if(gameDirections.get(counter).equals("RIGHT") && ((curTime - lastUpdate) > 1500)){*/
+                /*circleRec.x=game.actionResolver.getHorizontal()+500;*/
+            /**//*}*/
             circleRec.y = hole1.y + ((hole1.height/2)-25);
-            if((curTime - lastUpdate) > 1500) {
+           /* if((curTime - lastUpdate) > 1500) {
                 if (gameDirections.get(counter).equals("RIGHT") && circleRec.x > ((hole1.x + recKeeper[theCounter]-50))) {
                     backgroundColour.red();
-                    score = 0;
+                    //score = 0;
                     counter = 0;
                     game.actionResolver.sendToPhone(gameDirections.get(counter));
                     //updateRecs();
@@ -279,14 +189,34 @@ public class GameScreen implements Screen {
                 }
                 if (gameDirections.get(counter).equals("LEFT") && circleRec.x < hole1.x) {
                     backgroundColour.red();
-                    score = 0;
+                    //score = 0;
                     counter = 0;
                     game.actionResolver.sendToPhone(gameDirections.get(counter));
                     //updateRecs();
                     display = gameDirections.get(counter);
                     reset();
                 }
-            }
+            }*/
+        }
+        if(gameDirections.get(counter).equals("LEFT") && circleRec.x < 5 && ((curTime - lastUpdate) > 1500)){
+            moved = true;
+           /* backgroundColour.red();
+            //score = 0;
+            counter = 0;
+            game.actionResolver.sendToPhone(gameDirections.get(counter));
+            //updateRecs();
+            display = gameDirections.get(counter);
+            reset();*/
+        }
+        if(gameDirections.get(counter).equals("RIGHT") && circleRec.x > 945  && ((curTime - lastUpdate) > 1500)){
+            moved = true;
+            /*backgroundColour.red();
+            //score = 0;
+            counter = 0;
+            game.actionResolver.sendToPhone(gameDirections.get(counter));
+            //updateRecs();
+            display = gameDirections.get(counter);
+            reset();*/
         }
     }
 
@@ -294,7 +224,7 @@ public class GameScreen implements Screen {
      * Check if the ball is inside the current circle.
      */
     public void isInside(){
-        if(hole1.contains(circleRec)){
+        if(hole1.contains(circleRec) && !(gameDirections.get(counter).equals("LEFT") || gameDirections.get(counter).equals("RIGHT"))){
             updateBool = true;
             if(updateBool == true && holdTime > 2000){
                 spoken = false;
@@ -316,10 +246,30 @@ public class GameScreen implements Screen {
                 backgroundColour.blue();
             }
         }else{
+            if(moved){
+                spoken = false;
+                if(counter == 3){
+                    counter = -1;
+                }
+                counter++;
+                game.actionResolver.sendToPhone(gameDirections.get(counter));
+                display = gameDirections.get(counter);
+                score = score + 1;
+                setCurrentGameScore(score);
+                if(score > getHighScore()){
+                    setHighScore(score);
+                }
+                scoreSound.play(1);
+                updateRecs();
+                holdTime = 0;
+                updateBool = false;
+                backgroundColour.blue();
+                moved = false;
+            }else{
             backgroundColour.blue();
             display = gameDirections.get(counter);
             holdTime = 0;
-            updateBool = false;
+            updateBool = false;}
         }
     }
 
@@ -350,10 +300,10 @@ public class GameScreen implements Screen {
      */
     public void reset(){
         backgroundColour.blue();
+        theCounter = 0;
+        img = 0;
         hole1.width = recKeeper[theCounter];
         hole1.height = recKeeper[theCounter];
-        img = 0;
-        theCounter = 0;
         circleRec.x = hole1.x + ((hole1.width/2)-25);
     }
 

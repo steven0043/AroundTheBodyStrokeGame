@@ -11,7 +11,7 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import android.os.AsyncTask;
 
-public class ScorePoster  extends AsyncTask<String,Void,String>{
+public class ScorePoster extends AsyncTask<String,Void,String>{
 
     public ScorePoster(){
 
@@ -54,7 +54,6 @@ public class ScorePoster  extends AsyncTask<String,Void,String>{
             StringBuilder sb = new StringBuilder();
             String line = null;
 
-            // Read Server Response
             while((line = reader.readLine()) != null)
             {
                 sb.append(line);

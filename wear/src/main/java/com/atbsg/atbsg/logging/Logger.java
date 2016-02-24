@@ -248,4 +248,12 @@ public class Logger {
             array[i] = prefs.getString(userArrayKey + "_" + i, null);
         return array;
     }
+
+    public boolean newUserArray(String[] array) {
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putInt(userArrayKey +"_size", array.length);
+        for(int i=0;i<array.length;i++)
+            editor.putString(userArrayKey + "_" + i, array[i]);
+        return editor.commit();
+    }
 }

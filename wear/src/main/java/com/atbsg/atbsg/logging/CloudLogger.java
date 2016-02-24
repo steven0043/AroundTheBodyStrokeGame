@@ -72,7 +72,6 @@ public class CloudLogger {
                     nodeId = nodes.get(0).getId();
                     playStartMessages();
                     connected = true;
-                    System.out.println("CONNECTED!!! " + nodeId);
                 }
                 client.disconnect();
             }

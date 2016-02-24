@@ -1,19 +1,27 @@
 package com.atbsg.atbsg;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.method.ScrollingMovementMethod;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
+import android.widget.CheckBox;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 
@@ -35,6 +43,9 @@ public class MainActivity extends AppCompatActivity{
     private static Logger logger;
     public static AndroidLauncher game = new AndroidLauncher();
     static Context mContext;
+    private boolean ethics = true;
+    private static String userId = "no id";
+    private final String webService = "https://devweb2014.cis.strath.ac.uk/~emb12161/WAD/ATBSG/ATBSG.php";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,14 +82,7 @@ public class MainActivity extends AppCompatActivity{
         mProgressHorizontal.setProgressDrawable(hozDraw);
         mProgressHorizontal.setMax(horizontalMax);
         mProgress.setMax(verticalMax);
-        //makeHorizontalInvisible();
-        /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });*/
+        if(ethics){userEthicsAgreement();}
     }
 
     /**
@@ -92,10 +96,17 @@ public class MainActivity extends AppCompatActivity{
         final int mProgressStatuss = mProgressStatus;
         if((direction.equals("UP") || direction.equals("DOWN"))){
             mProgress.setProgress(mProgressStatuss);
+            if(mProgressStatuss > mProgress.getMax()+300){
+                mProgress.setMax(mProgress.getMax()*2);
+            }
         }
         if((direction.equals("LEFT") || direction.equals("RIGHT"))){
             mProgressHorizontal.setProgress(mProgressStatuss);
+            if(mProgressStatus > mProgressHorizontal.getMax()+300){
+                mProgressHorizontal.setMax(mProgressHorizontal.getMax()*2);
+            }
         }
+
         if(!mTextView.getText().equals(direction)){
 
             mTextView.setText(direction + " | " + score);}
@@ -114,7 +125,7 @@ public class MainActivity extends AppCompatActivity{
         mProgressHorizontal.setMax(horizontalMax);
         mProgress.setMax(verticalMax);
         currentMode = gameMode;
-        mTextViewDifficulty.setText("Difficulty: " + gameMode);
+        mTextViewDifficulty.setText(gameMode);
     }
 
     /**
@@ -122,6 +133,9 @@ public class MainActivity extends AppCompatActivity{
      * @param mProgressStatus
      */
     protected void updateHorizontalProgressBar(int mProgressStatus){
+        if(mProgressStatus > mProgressHorizontal.getMax()+50){
+            mProgressHorizontal.setMax(mProgressHorizontal.getMax()*2);
+        }
         mProgressHorizontal.setProgress(mProgressStatus);
     }
 
@@ -153,12 +167,17 @@ public class MainActivity extends AppCompatActivity{
                 item.setChecked(true);
                 logger.setMuted(true);
             }
-            //new ScorePoster().execute("0", Integer.toString(3), new Date().toString(), "Easy");
-            return true;
         }
 
         if(id==R.id.game){
             playGame();
+        }
+        if(id==R.id.webService){
+            Uri uri = Uri.parse(webService);
+            startActivity(new Intent(Intent.ACTION_VIEW, uri));
+        }
+        if(id==R.id.userTasks){
+            userTasks();
         }
 
         return super.onOptionsItemSelected(item);
@@ -177,6 +196,21 @@ public class MainActivity extends AppCompatActivity{
     }
 
     /**
+     * Sets the userId
+     */
+    public static void setUserId(String user){
+        userId = user;
+    }
+
+    /**
+     * Returns userId
+     * @return userId
+     */
+    public static String getUserId(){
+        return userId;
+    }
+
+    /**
      * Plays speech through the phone.
      * @param speech
      */
@@ -192,6 +226,72 @@ public class MainActivity extends AppCompatActivity{
         }catch (Exception e){
 
         }
+    }
+
+    public void userEthicsAgreement(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Participant Information and Consent");
+
+        final TextView information = new TextView(this);
+        final CheckBox agree = new CheckBox(this);
+        UserEthics userEthics = new UserEthics();
+
+        information.setText(userEthics.getUserEthics());
+        information.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+        information.setVerticalScrollBarEnabled(true);
+        information.setMovementMethod(new ScrollingMovementMethod());
+
+        agree.setText("I Have Read and Agree To Participate");
+        agree.setTextSize(TypedValue.COMPLEX_UNIT_SP,22);
+        LinearLayout ll=new LinearLayout(this);
+        ll.setOrientation(LinearLayout.VERTICAL);
+
+        ll.addView(agree);
+        ll.addView(information);
+
+        builder.setView(ll);
+        builder.setCancelable(false);
+
+        builder.setPositiveButton("I've made my decision", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (!agree.isChecked()) {
+                    System.exit(0);
+                }/*else{
+                    userTasks();
+                }*/
+            }
+
+        });
+        builder.show();
+    }
+
+    public void userTasks(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("User Tasks");
+
+        final TextView information = new TextView(this);
+        UserEthics userEthics = new UserEthics();
+
+        information.setText(userEthics.getUserTasks());
+        information.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+        information.setVerticalScrollBarEnabled(true);
+        information.setMovementMethod(new ScrollingMovementMethod());
+
+        LinearLayout ll=new LinearLayout(this);
+        ll.setOrientation(LinearLayout.VERTICAL);
+
+        ll.addView(information);
+
+        builder.setView(ll);
+
+        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+            }
+
+        });
+        builder.show();
     }
 
     /**

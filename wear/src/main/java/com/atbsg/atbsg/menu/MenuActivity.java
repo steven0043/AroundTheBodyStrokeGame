@@ -20,8 +20,10 @@ import android.util.Log;
 import android.view.View;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ListView;
 import android.widget.TextView;
+
 import com.atbsg.atbsg.R;
 import com.atbsg.atbsg.games.CalibrationActivity;
 import com.atbsg.atbsg.games.PhoneGameActivity;
@@ -31,11 +33,12 @@ import com.atbsg.atbsg.logging.CloudLogger;
 import com.atbsg.atbsg.logging.Logger;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class MenuActivity extends Activity implements WearableListView.ClickListener {
 
     private ListView lv;
-    String[] elements = {"How To Play", "Game Modes", "My Progress", "Settings", "Sensor Data", "Play Game"};
+    String[] elements = {"How To Play", "Game Modes", "My Progress", "Settings", /*"Sensor Data",*/ "Play Game On Phone"};
     public static Logger logger;
     private static final String START_SPEECH = "Welcome to the around the body stroke recovery game. Your starting " +
             "options are: how to play, game modes, my progress and settings";
@@ -43,6 +46,7 @@ public class MenuActivity extends Activity implements WearableListView.ClickList
     boolean scoreMenu = false;
     boolean settingsMenu = false;
     boolean viewUsersMenu = false;
+    boolean deleteUsersMenu = false;
     public CloudLogger cloudLogger;
     private int mBindFlag;
     private Messenger mServiceMessenger;
@@ -66,6 +70,7 @@ public class MenuActivity extends Activity implements WearableListView.ClickList
         if(b!=null){
             String[] array=b.getStringArray("listItems");
             boolean voiced = b.getBoolean("voiced");
+            boolean delete = b.getBoolean("delete");
             elements = array;
             if(elements[0].startsWith("Easy High")){
                 scoreMenu = true;
@@ -73,7 +78,10 @@ public class MenuActivity extends Activity implements WearableListView.ClickList
                 gameMenu = true;
             }else if(elements[0].startsWith("Your")){
                 settingsMenu = true;
-            }else{
+            }else if (delete){
+                deleteUsersMenu = true;
+            }
+            else{
                 viewUsersMenu = true;
             }
             if(voiced) {
@@ -87,7 +95,7 @@ public class MenuActivity extends Activity implements WearableListView.ClickList
             }else{
                 logger.setOpened(logger.getOpened()+1);
             }
-            Intent service = new Intent(MenuActivity.this, VoiceService.class);
+            Intent service = new Intent(MenuActivity.this, com.atbsg.atbsg.menu.VoiceService.class);
             MenuActivity.this.startService(service);
             mBindFlag = Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH ? 0 : Context.BIND_ABOVE_CLIENT;
             cloudLogger = new CloudLogger(this);
@@ -127,7 +135,7 @@ public class MenuActivity extends Activity implements WearableListView.ClickList
      */
     public void startSettingsActivity() {
         Bundle b = new Bundle();
-        b.putStringArray("listItems", new String[]{"Your Unique I.D.", "Change User", "Create New User"});
+        b.putStringArray("listItems", new String[]{"Your Unique I.D.", "Change User", "Create New User", "Delete User"});
         Intent intent = new Intent(this, MenuActivity.class);
         intent.putExtras(b);
         startActivity(intent);
@@ -141,6 +149,14 @@ public class MenuActivity extends Activity implements WearableListView.ClickList
         startActivity(intent);
     }
 
+    public void startDeleteUserActivity() {
+        Bundle b = new Bundle();
+        b.putStringArray("listItems", logger.loadUserArray());
+        b.putBoolean("delete", true);
+        Intent intent = new Intent(this, MenuActivity.class);
+        intent.putExtras(b);
+        startActivity(intent);
+    }
 
     public void viewUniqueActivity(){
         Bundle b=new Bundle();
@@ -185,7 +201,7 @@ public class MenuActivity extends Activity implements WearableListView.ClickList
     }
 
     public void startSensorActivity() {
-        Intent intent = new Intent(this, SensorMenuActivity.class);
+        Intent intent = new Intent(this, com.atbsg.atbsg.menu.SensorMenuActivity.class);
         startActivity(intent);
     }
 
@@ -203,6 +219,7 @@ public class MenuActivity extends Activity implements WearableListView.ClickList
      * Start the game on the connected phone.
      */
     public void startPhoneGameActivity() {
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         Intent i = new Intent(this, PhoneGameActivity.class);
         startActivity(i);
     }
@@ -217,7 +234,7 @@ public class MenuActivity extends Activity implements WearableListView.ClickList
 
     @Override
     protected void onDestroy() {
-        if(!gameMenu && !scoreMenu && !viewUsersMenu && !settingsMenu) {
+        if(!gameMenu && !scoreMenu && !viewUsersMenu && !settingsMenu && !deleteUsersMenu) {
             android.os.Process.killProcess(android.os.Process.myPid());
             System.exit(0);
         }
@@ -234,7 +251,7 @@ public class MenuActivity extends Activity implements WearableListView.ClickList
         Integer tag = (Integer) viewHolder.itemView.getTag();
         String text = (String) viewHolder.itemView.getTag(tag);
         System.out.println("Text " + text);
-        if(!gameMenu && !scoreMenu && !viewUsersMenu && !settingsMenu) {
+        if(!gameMenu && !scoreMenu && !viewUsersMenu && !settingsMenu && !deleteUsersMenu) {
             if (tag == 0) {
                 startHowActivity();
             }
@@ -247,14 +264,14 @@ public class MenuActivity extends Activity implements WearableListView.ClickList
             if (tag == 3) {
                 startSettingsActivity();
             }
-            if (tag == 4) {
+            /*if (tag == 4) {
                 startSensorActivity();
-            }
-            if (tag == 5) {
+            }*/
+            if (tag == 4) {
                 startPhoneGameActivity();
             }
         }
-        if(gameMenu && !scoreMenu) {
+        if(gameMenu && !scoreMenu && !viewUsersMenu && !settingsMenu && !deleteUsersMenu) {
             if (tag == 0) {
                 startGameModeActivity(1000, 2000);
             }
@@ -265,7 +282,7 @@ public class MenuActivity extends Activity implements WearableListView.ClickList
                 startGameModeActivity(4000, 8000);
             }
         }
-        if(settingsMenu && !scoreMenu && !gameMenu && !viewUsersMenu) {
+        if(settingsMenu && !scoreMenu && !gameMenu && !viewUsersMenu && !deleteUsersMenu) {
             if (tag == 0) {
                 viewUniqueActivity();
             }
@@ -275,10 +292,23 @@ public class MenuActivity extends Activity implements WearableListView.ClickList
             if (tag == 2) {
                 logger.saveUserArray(logger.generateUnique(6));
             }
+            if (tag == 3) {
+                startDeleteUserActivity();
+            }
         }
-        if(viewUsersMenu && !settingsMenu && !scoreMenu && !gameMenu) {
+        if(viewUsersMenu && !settingsMenu && !scoreMenu && !gameMenu && !deleteUsersMenu) {
             String[] array = logger.loadUserArray();
             logger.setCurrentUser(array[tag]);
+        }
+        if(deleteUsersMenu && !viewUsersMenu && !settingsMenu && !scoreMenu && !gameMenu) {
+            int i = tag;
+            ArrayList<String> userList = new ArrayList<String>(Arrays.asList(logger.loadUserArray()));
+            if(userList.size() > 1) {
+                userList.remove(i);
+                String[] newUserArray = userList.toArray(new String[userList.size()]);
+                logger.newUserArray(newUserArray);
+            }
+            startSettingsActivity();
         }
     }
 
@@ -420,11 +450,11 @@ public class MenuActivity extends Activity implements WearableListView.ClickList
     }
 
     public void startService() {
-        startService(new Intent(MenuActivity.this, VoiceService.class));
+        startService(new Intent(MenuActivity.this, com.atbsg.atbsg.menu.VoiceService.class));
     }
 
     public void stopService() {
-        stopService(new Intent(getBaseContext(), VoiceService.class));
+        stopService(new Intent(getBaseContext(), com.atbsg.atbsg.menu.VoiceService.class));
     }
 
     @Override
@@ -432,7 +462,7 @@ public class MenuActivity extends Activity implements WearableListView.ClickList
     {
         super.onStart();
 
-        bindService(new Intent(this, VoiceService.class), mServiceConnection, mBindFlag);
+        bindService(new Intent(this, com.atbsg.atbsg.menu.VoiceService.class), mServiceConnection, mBindFlag);
     }
 
     @Override
@@ -460,7 +490,7 @@ public class MenuActivity extends Activity implements WearableListView.ClickList
 
             mServiceMessenger = new Messenger(service);
             Message msg = new Message();
-            msg.what = VoiceService.MSG_RECOGNIZER_START_LISTENING;
+            msg.what = com.atbsg.atbsg.menu.VoiceService.MSG_RECOGNIZER_START_LISTENING;
 
             try
             {
