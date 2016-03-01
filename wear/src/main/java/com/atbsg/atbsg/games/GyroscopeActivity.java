@@ -53,7 +53,7 @@ public class GyroscopeActivity extends WearableActivity implements SensorEventLi
             }
         });
         mSensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
-        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
         mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_UI);
 
     }
@@ -69,21 +69,11 @@ public class GyroscopeActivity extends WearableActivity implements SensorEventLi
 
         if((curTime - lastUpdate) > 10) {
 
-            // Isolate the force of gravity with the low-pass filter.
-            gravity[0] = alpha * gravity[0] + (1 - alpha) * event.values[0];
-            gravity[1] = alpha * gravity[1] + (1 - alpha) * event.values[1];
-            gravity[2] = alpha * gravity[2] + (1 - alpha) * event.values[2];
-
-            // Remove the gravity contribution with the high-pass filter.
-            linear_acceleration[0] = event.values[0] - gravity[0];
-            linear_acceleration[1] = event.values[1] - gravity[1];
-            linear_acceleration[2] = event.values[2] - gravity[2];
-
             if (textBool == true) {
                 //mTextView.setText("\t\n x: " + direction +"\t\n x: " + linear_acceleration[0] + "\t\n y: " + df.format(linear_acceleration[1]) + "\t\n z: " + df.format(linear_acceleration[2]));
                 /*mTextView.setText("\t\n x: " + direction +"\t\n x: " + df.format(xAcc) + "\t\n y: " + df.format(yAcc) + "\t\n z: " + df.format(zAcc));
                 doWork();*/
-                 mTextView.setText("X " + linear_acceleration[0] + "\nZ " + + linear_acceleration[2]);
+                 mTextView.setText("X " + event.values[0] + "\nY " + + event.values[1] + "\nZ " + event.values[2]);
                  //mTextView.setText("X " + event.values[0] + "\nY " + + event.values[1] + "\nZ " + + event.values[2]);
             }
             lastUpdate = curTime;

@@ -7,7 +7,9 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Vibrator;
 
+import com.atbsg.atbsg.logging.CloudLogger;
 import com.atbsg.atbsg.logging.Logger;
+import com.atbsg.atbsg.logging.UserSessionData;
 
 /**
  * Created by Steven on 13/12/2015.
@@ -18,6 +20,7 @@ public class SensorListener implements SensorEventListener {
     private final Sensor mAccelerometer;
     private final SensorActivity currentActivity;
     private long lastUpdate = 0;
+    private long lastDataUpdate = 0;
     final float alpha = (float) 0.8;
     private int score = 0;
     private double[] gravity ={0,0,0};
@@ -31,6 +34,12 @@ public class SensorListener implements SensorEventListener {
     GameHelper gameHelper = new GameHelper();
     int horizontalMax = 1000;
     int verticalMax = 2000;
+    String fileSend = "";
+    String allFileSend = "";
+    long tStart = System.currentTimeMillis();
+    long totalTime = System.currentTimeMillis();
+    int i = UserSessionData.getMap().size();
+    MagnetometerData magnetometerData;
 
     public SensorListener(SensorManager sm, SensorActivity currentActivity, int horizontalMax, int verticalMax){
         mSensorManager = sm;
@@ -39,7 +48,10 @@ public class SensorListener implements SensorEventListener {
         this.horizontalMax = horizontalMax;
         this.verticalMax = verticalMax;
         logger = new Logger(currentActivity);
+        magnetometerData = new MagnetometerData(currentActivity);
         v = (Vibrator) currentActivity.getSystemService(Context.VIBRATOR_SERVICE);
+        fileSend = getDifficulty()+"\n";
+        allFileSend = getDifficulty()+"\n";
         mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_UI);
     }
 
@@ -54,28 +66,28 @@ public class SensorListener implements SensorEventListener {
         long curTime = System.currentTimeMillis();
         if((curTime - lastUpdate) > 10) {
 
-            removeGravity(event);
+            if(event.sensor.getType()==Sensor.TYPE_ACCELEROMETER) {
+                removeGravity(event);
 
-            addToAverages();
+                addToAverages();
+                collectUserData();
 
-            if(goingUp()){
-                applyUpWeighting();
+                if (goingUp()) {
+                    applyUpWeighting();
+                } else if (goingDown()) {
+                    applyDownWeighting();
+                } else if (goingRight()) {
+                    applyRightWeighting();
+                } else if (goingLeft()) {
+                    applyLeftWeighting();
+                }
+
+                checkCompletedMovement();
+
+                updateView();
             }
-            else if (goingDown()){
-               applyDownWeighting();
-            }
-            else if(goingRight()){
-               applyRightWeighting();
-            }
-            else if (goingLeft()) {
-                applyLeftWeighting();
-            }
-
-            checkCompletedMovement();
-
-            updateView();
-
             lastUpdate = curTime;
+
         }
     }
 
@@ -210,12 +222,53 @@ public class SensorListener implements SensorEventListener {
         }
     }
 
+    public void collectUserData(){
+        int keepCollecting = 0;
+        if(verticalMax == 2000){
+            keepCollecting = 12;
+        }
+        else if(verticalMax == 8000){
+           keepCollecting = 4;
+        }else {keepCollecting = 12; }
+        long nowTime = System.currentTimeMillis();
+        if((nowTime - lastDataUpdate) > 300) {
+            long tEnd = System.currentTimeMillis();
+            long tDelta = tEnd - tStart;
+            double elapsedSeconds = tDelta / 1000.0;
+            double percentage = 0;
+            double status = (double) mProgressStatus;
+            if(gameHelper.isUp() || gameHelper.isDown()){
+                double vertical = (double) verticalMax;
+                percentage = ((status/vertical) * 100.0);
+            }
+            if(gameHelper.isLeft() || gameHelper.isRight()) {
+                double horizontal = (double) horizontalMax;
+                percentage = ((status/horizontal) * 100.0);
+            }
+            fileSend = fileSend + "\n" + gameHelper.getNextDirections() + "\nAccelerometer" + ": \nX[" + linear_acceleration[0] + "]" +
+                    "\nY[" + linear_acceleration[1] + "]" + "\nZ[" + linear_acceleration[2] + "]"
+                    + "\n\nMagnetometer" + ": \nX[" + magnetometerData.getX() + "]" +
+                    "\nY[" + magnetometerData.getY() + "]" + "\nZ[" + magnetometerData.getZ() + "]"
+                    + "\n\nScore: " + score
+                    + "\nProgress: " + percentage + "%"
+                    + "\nTime on this direction: " + elapsedSeconds + " seconds";
+            allFileSend = allFileSend + fileSend;
+            lastDataUpdate = nowTime;
+            if(score < keepCollecting) {
+                logger.addToHashMap(Integer.toString(i), fileSend);
+            }
+            fileSend = "";
+            i++;
+        }
+    }
+
     /**
      * Check if the user has completed the current indicated direction
      */
     public void checkCompletedMovement(){
         if(!(direction.equals("") && moved)){
             if(gameHelper.correctDirection(direction)){
+                tStart = System.currentTimeMillis();
                 gameHelper.addDirection();
                 gameHelper.remove();
                 score++;
@@ -297,6 +350,7 @@ public class SensorListener implements SensorEventListener {
      * shared preferences and unregisters the acceleromter.
      */
     public void unregister() {
+        //logger.addToUserData(allFileSend);
         if(verticalMax == 2000){
             logger.setLastEasyScore(score);
             //cloudLogger.addEasyCompletion("JohnDoe", score);
@@ -315,10 +369,35 @@ public class SensorListener implements SensorEventListener {
             System.out.println("Add Hard");
             //cloudLogger.addHardCompletion("JohnDoe", score);
         }
+        long tEnd = System.currentTimeMillis();
+        long tDelta = tEnd - totalTime;
+        double elapsedSeconds = tDelta / 1000.0;
+        fileSend = fileSend + "\nTotal time spent: " + elapsedSeconds + " seconds";
+        logger.addToHashMap(Integer.toString(i), fileSend);
+        //logger.sendText();
         //playSound("Your final score is " + score);
-        System.out.println("DESTROOOYYYEDD");
+        //System.out.println("DESTROOOYYYEDD");
         mSensorManager.unregisterListener(this);
         mSensorManager.unregisterListener(this, mAccelerometer);
+        //magnetometerData.unregister();
         mSensorManager.flush(this);
+    }
+
+    public int getI(){
+        return i;
+    }
+    private String getDifficulty(){
+        if(verticalMax == 2000){
+            return "EASY";
+        }
+        else if(verticalMax == 4000){
+            return "MEDIUM";
+        }
+        else if(verticalMax == 8000){
+            return "HARD";
+        }else{
+            return "";
+        }
+
     }
 }

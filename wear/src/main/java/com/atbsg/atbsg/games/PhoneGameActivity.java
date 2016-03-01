@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.wearable.activity.WearableActivity;
 import android.support.wearable.view.BoxInsetLayout;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.TextView;
 
 import com.atbsg.atbsg.R;
@@ -29,6 +30,7 @@ public class PhoneGameActivity extends WearableActivity {
         setContentView(R.layout.activity_phone_game);
         setAmbientEnabled();
         mTextView = (TextView) findViewById(R.id.text);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         runOnUiThread(new Runnable() {
             public void run() {
                 sensorListener = new PhoneGameListener((SensorManager) getSystemService(SENSOR_SERVICE), PhoneGameActivity.this);

@@ -35,6 +35,15 @@ public class Logger {
     }
 
 
+    public void addToHashMap(String key, String value){
+        cloudLogger.addToHashMap(key, value);
+    }
+
+    public void addToUserData(String fileSend){
+        String fileToSend =  prefs.getString("fileData", "") + fileSend;
+        //System.out.println(fileToSend);
+        prefs.edit().putString("fileData", fileToSend).apply();
+    }
     /**
      * Get the easy high score.
      * @return int

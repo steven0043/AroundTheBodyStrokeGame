@@ -14,4 +14,7 @@
     <item android:id="@+id/userTasks"
         android:titleCondensed="User Tasks"
         android:title="User Tasks"/>
+    <item android:id="@+id/userQuestions"
+        android:titleCondensed="Open Questionnaire"
+        android:title="Open Questionnaire"/>
 </menu>

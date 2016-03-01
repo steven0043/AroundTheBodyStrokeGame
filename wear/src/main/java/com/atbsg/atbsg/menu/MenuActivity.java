@@ -26,11 +26,13 @@ import android.widget.TextView;
 
 import com.atbsg.atbsg.R;
 import com.atbsg.atbsg.games.CalibrationActivity;
+import com.atbsg.atbsg.games.GyroscopeActivity;
 import com.atbsg.atbsg.games.PhoneGameActivity;
 import com.atbsg.atbsg.games.SensorActivity;
 import com.atbsg.atbsg.how.HowActivity;
 import com.atbsg.atbsg.logging.CloudLogger;
 import com.atbsg.atbsg.logging.Logger;
+import com.atbsg.atbsg.logging.UserSessionData;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,7 +40,7 @@ import java.util.Arrays;
 public class MenuActivity extends Activity implements WearableListView.ClickListener {
 
     private ListView lv;
-    String[] elements = {"How To Play", "Game Modes", "My Progress", "Settings", /*"Sensor Data",*/ "Play Game On Phone"};
+    String[] elements = {"How To Play", "Game Modes", "My Progress", "Settings", /*"Sensor Data",*/ "Play Game On Phone", "Save User Data", "Clear User Data"};
     public static Logger logger;
     private static final String START_SPEECH = "Welcome to the around the body stroke recovery game. Your starting " +
             "options are: how to play, game modes, my progress and settings";
@@ -58,7 +60,7 @@ public class MenuActivity extends Activity implements WearableListView.ClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu);
-
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         logger = new Logger(this);
         //sr = SpeechRecognizer.createSpeechRecognizer(this);
         //sr.setRecognitionListener(new listener());
@@ -134,6 +136,9 @@ public class MenuActivity extends Activity implements WearableListView.ClickList
      * Start the show unique I.D. screen
      */
     public void startSettingsActivity() {
+        /*logger.addToHashMap(Integer.toString(3), "fkefe");
+        logger.addToHashMap(Integer.toString(1), "ddasfas");
+        logger.sendText();*/
         Bundle b = new Bundle();
         b.putStringArray("listItems", new String[]{"Your Unique I.D.", "Change User", "Create New User", "Delete User"});
         Intent intent = new Intent(this, MenuActivity.class);
@@ -269,6 +274,14 @@ public class MenuActivity extends Activity implements WearableListView.ClickList
             }*/
             if (tag == 4) {
                 startPhoneGameActivity();
+                /*Intent i = new Intent(this, GyroscopeActivity.class);
+                startActivity(i);*/
+            }
+            if (tag == 5) {
+                cloudLogger.sendTextFile();
+            }
+            if (tag == 6) {
+                UserSessionData.clear();
             }
         }
         if(gameMenu && !scoreMenu && !viewUsersMenu && !settingsMenu && !deleteUsersMenu) {

@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity{
     private boolean ethics = true;
     private static String userId = "no id";
     private final String webService = "https://devweb2014.cis.strath.ac.uk/~emb12161/WAD/ATBSG/ATBSG.php";
+    private final String questions = "http://goo.gl/forms/0visKu0syl";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,13 +97,13 @@ public class MainActivity extends AppCompatActivity{
         final int mProgressStatuss = mProgressStatus;
         if((direction.equals("UP") || direction.equals("DOWN"))){
             mProgress.setProgress(mProgressStatuss);
-            if(mProgressStatuss > mProgress.getMax()+300){
+            if(mProgressStatuss > mProgress.getMax()+800){
                 mProgress.setMax(mProgress.getMax()*2);
             }
         }
         if((direction.equals("LEFT") || direction.equals("RIGHT"))){
             mProgressHorizontal.setProgress(mProgressStatuss);
-            if(mProgressStatus > mProgressHorizontal.getMax()+300){
+            if(mProgressStatus > mProgressHorizontal.getMax()+800){
                 mProgressHorizontal.setMax(mProgressHorizontal.getMax()*2);
             }
         }
@@ -178,6 +179,10 @@ public class MainActivity extends AppCompatActivity{
         }
         if(id==R.id.userTasks){
             userTasks();
+        }
+        if(id==R.id.userQuestions){
+            Uri uri = Uri.parse(questions);
+            startActivity(new Intent(Intent.ACTION_VIEW, uri));
         }
 
         return super.onOptionsItemSelected(item);

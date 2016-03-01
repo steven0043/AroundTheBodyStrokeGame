@@ -1,23 +1,40 @@
 package com.atbsg.atbsg.logging;
 
 
+import android.app.Activity;
 import android.content.Context;
+import android.os.Environment;
 
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.wearable.Asset;
+import com.google.android.gms.wearable.DataApi;
+import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
+import com.google.android.gms.wearable.PutDataMapRequest;
+import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
+import java.io.PrintStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -30,10 +47,14 @@ public class CloudLogger {
     private Context context;
     private String contextClass = "";
     public boolean connected = false;
+    //static HashMap<String, String> hm = new HashMap<String, String>();
+    UserSessionData usd = new UserSessionData();
+    //Logger logger;
 
     public CloudLogger(Context context){
         this.context=context;
         contextClass = context.getClass().getSimpleName();
+        //logger = new Logger((Activity) context);
     }
 
     /**
@@ -102,7 +123,7 @@ public class CloudLogger {
      * Sends message to the phone that's connected.
      */
     public void sendScoreToCloud(final String gameMode) {
-        //System.out.println("SENDING score null");
+        System.out.println("SENDING score null");
         if (nodeId != null) {
             new Thread(new Runnable() {
                 @Override
@@ -142,5 +163,49 @@ public class CloudLogger {
      */
     public boolean isConnected(){
         return connected;
+    }
+
+    public PutDataMapRequest toDataMap(HashMap<String, String> hashMap) {
+        PutDataMapRequest putDataMapReq = PutDataMapRequest.create("/file"+generateUnique(3));
+
+        DataMap dataMap = new DataMap();
+        for (Map.Entry<String, String> entry : hashMap.entrySet()) {
+            putDataMapReq.getDataMap().putString(entry.getKey(), entry.getValue());
+        }
+        return putDataMapReq;
+    }
+
+    /**
+     * Generate a unique I.D.
+     * @param len
+     * @return String
+     */
+    public String generateUnique(int len){
+        final String AB = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        Random rnd = new Random();
+        StringBuilder sb = new StringBuilder( len );
+        for( int i = 0; i < len; i++ )
+            sb.append( AB.charAt( rnd.nextInt(AB.length()) ) );
+        return sb.toString();
+    }
+
+    public void sendTextFile()
+    {
+        if (nodeId != null) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    System.out.println("SENDING PROGRESS");
+                    client.blockingConnect(CONNECTION_TIME_OUT_MS, TimeUnit.MILLISECONDS);
+                    PutDataRequest putDataReq = toDataMap(usd.getMap()).asPutDataRequest();
+                    Wearable.DataApi.putDataItem(client, putDataReq);
+                    client.disconnect();
+                }
+            }).start();
+        }
+    }
+
+    public void addToHashMap(String key, String value){
+         usd.addToHashMap(key, value);
     }
 }

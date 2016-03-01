@@ -57,4 +57,6 @@ public class Logger {
 
         return highScore;
     }
+
+
 }

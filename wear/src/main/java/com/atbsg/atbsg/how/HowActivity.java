@@ -3,6 +3,7 @@ package com.atbsg.atbsg.how;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.wearable.view.WatchViewStub;
+import android.view.WindowManager;
 import android.widget.TextView;
 
 import com.atbsg.atbsg.R;
@@ -21,6 +22,7 @@ public class HowActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_how);
         logger = new Logger(this);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
 
         Bundle b=this.getIntent().getExtras();
