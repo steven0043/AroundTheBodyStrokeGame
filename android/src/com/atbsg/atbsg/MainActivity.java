@@ -5,33 +5,30 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.text.method.ScrollingMovementMethod;
 import android.util.TypedValue;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 
-import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
-
-import java.util.Date;
 import java.util.Locale;
-import com.badlogic.gdx.backends.android.AndroidApplication;
-import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 
+/**
+ * Created by Steven
+ *
+ * The Main Activity for the smartphone app.
+ * Contains the progress bars that act as a second
+ * screen for the smartwatch.
+ */
 
 public class MainActivity extends AppCompatActivity{
     static TextToSpeech t1;
@@ -41,9 +38,9 @@ public class MainActivity extends AppCompatActivity{
     public static String currentMode = "";
     int verticalMax = 2000;
     private static Logger logger;
-    public static AndroidLauncher game = new AndroidLauncher();
+    public static GameActivity game = new GameActivity();
     static Context mContext;
-    private boolean ethics = true;
+    private boolean ethics = false;
     private static String userId = "no id";
     private final String webService = "https://devweb2014.cis.strath.ac.uk/~emb12161/WAD/ATBSG/ATBSG.php";
     private final String questions = "http://goo.gl/forms/0visKu0syl";
@@ -52,9 +49,7 @@ public class MainActivity extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-    /*    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);*/
-        System.out.println("On Create!!");
+
         logger = new Logger(this);
         mContext = this;
 
@@ -78,7 +73,7 @@ public class MainActivity extends AppCompatActivity{
         mProgressHorizontal = (ProgressBar) findViewById(R.id.progressBar2);
         Drawable draw = getResources().getDrawable(R.drawable.custom_progressbar);
         Drawable hozDraw = getResources().getDrawable(R.drawable.custom_progressbarhorizontal);
-        // set the drawable as progress drawable
+
         mProgress.setProgressDrawable(draw);
         mProgressHorizontal.setProgressDrawable(hozDraw);
         mProgressHorizontal.setMax(horizontalMax);
@@ -171,17 +166,13 @@ public class MainActivity extends AppCompatActivity{
         }
 
         if(id==R.id.game){
-            playGame();
+            circlesGameInfo();
+        }
+        if(id==R.id.highScore){
+            circlesGameHighScore();
         }
         if(id==R.id.webService){
             Uri uri = Uri.parse(webService);
-            startActivity(new Intent(Intent.ACTION_VIEW, uri));
-        }
-        if(id==R.id.userTasks){
-            userTasks();
-        }
-        if(id==R.id.userQuestions){
-            Uri uri = Uri.parse(questions);
             startActivity(new Intent(Intent.ACTION_VIEW, uri));
         }
 
@@ -233,6 +224,9 @@ public class MainActivity extends AppCompatActivity{
         }
     }
 
+    /**
+     * Agreement dialog for participants in the user evaluation.
+     */
     public void userEthicsAgreement(){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Participant Information and Consent");
@@ -262,15 +256,17 @@ public class MainActivity extends AppCompatActivity{
             public void onClick(DialogInterface dialog, int which) {
                 if (!agree.isChecked()) {
                     System.exit(0);
-                }/*else{
-                    userTasks();
-                }*/
+                }
             }
 
         });
         builder.show();
     }
 
+    /**
+     * Dialog that provides a reference to the user tasks
+     * for participants in the evaluation.
+     */
     public void userTasks(){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("User Tasks");
@@ -297,6 +293,34 @@ public class MainActivity extends AppCompatActivity{
 
         });
         builder.show();
+    }
+
+    /**
+     * A dialog that shows the high score of the circles game.
+     */
+    private void circlesGameHighScore(){
+        new AlertDialog.Builder(this)
+                .setTitle("Circles Game High Score")
+                .setMessage("Your high score is: " + logger.getGameHighScore())
+                .show();
+    }
+
+    /**
+     * A dialog that shows information regarding the circles game.
+     */
+    private void circlesGameInfo(){
+        new AlertDialog.Builder(this)
+                .setTitle("Circles Game Information")
+                .setMessage("To play this game, on your smartwatch select 'Play Game on Phone' from the menu.\n" +
+                        "You must move your arm and try to hold the ball inside the circle for 2 seconds.")
+                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        playGame();
+                    }
+
+                })
+                .show();
     }
 
     /**

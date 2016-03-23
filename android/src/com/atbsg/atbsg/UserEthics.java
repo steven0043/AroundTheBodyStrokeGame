@@ -4,6 +4,9 @@ import java.util.Date;
 
 /**
  * Created by Steven on 23/02/2016.
+ *
+ * Class especially for containing the ethical and informative
+ * Strings that are placed within the dialogs.
  */
 public class UserEthics {
 
@@ -11,6 +14,10 @@ public class UserEthics {
 
         }
 
+        /**
+         * Method for getting the user agreement.
+         * @return String user ethics agreement
+         */
         public String getUserEthics(){
                 return "Name of department: Computer and Information Sciences (CIS)\n\n" +
                         "Title of the study: Around The Body Stroke Recovery Game User Study\n\n\n" +
@@ -22,7 +29,7 @@ public class UserEthics {
                         "Do you have to take part?\n\n" +
                         "You do not have to take part in this project and you have a right to withdraw at any time if you feel uncomfortable or simply don’t want to continue (and you don’t need to give a reason).\n\n\n" +
                         "What will you do in the project?\n\n" +
-                        "You will wear the project smartwatch and carry out two rounds of exercises with it: firstly simple up, down, left, right movements then playing a small game of getting a ball in a circle. Instructions will be given at each stage and feedback shown on the phone.\n\n\n" +
+                        "You will wear the project smartwatch and carry out two rounds of exercises with it: firstly simple up, down, left, right movements then playing a small game of getting a ball in a ball. Instructions will be given at each stage and feedback shown on the phone.\n\n\n" +
                         "What happens to the information in the project? \n\n" +
                         "We will record movement times and sensor data but no personal data will be recorded. You will also be asked to complete an anonymous questionnaire on your opinion and experience from using the software and will not identify you. The University of Strathclyde is registered with the Information Commissioner’s Office. We will not record any personal data as defined by the Data Protection Act 1998.\n\n\n" +
                         "Thank you for reading this information – please ask any questions if you are unsure about what is written here. \n\n\n" +
@@ -63,6 +70,10 @@ public class UserEthics {
                         "Date: " + new Date().toString();
         }
 
+        /**
+         * Method for getting the user tasks.
+         * @return String user tasks.
+         */
         public String getUserTasks(){
                 return "Thank you for agreeing to take part. Please try and attempt the tasks below, these tasks are available to view from the settings menu and" +
                         " via print out from the project supervisor Steven Macleod. Before we start, please make sure you have both the smartphone and smartwatch app open. Now, If you could please try to complete these tasks associated with the app:\n" +
@@ -75,7 +86,7 @@ public class UserEthics {
                         "\n\n" +
                         "4. Following this, please navigate back to the main menu of the smartwatch and select ‘Play Game on Phone’.\n" +
                         "\n\n" +
-                        "5. Now, please move your arm in the directions that are indicated on the phone. Trying to get the ball inside the circle until a score of 6 is reached.\n" +
+                        "5. Now, please move your arm in the directions that are indicated on the phone. Trying to get the ball inside the ball until a score of 6 is reached.\n" +
                         "\n\n" +
                         "6. Following this, please navigate back to the main menu of the smartwatch and select ‘Settings’ followed by ‘Your unique I.D.’.  \n" +
                         "\n\n" +

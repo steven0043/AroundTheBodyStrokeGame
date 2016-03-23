@@ -10,7 +10,13 @@ import com.atbsg.atbsg.R;
 import com.atbsg.atbsg.logging.CloudLogger;
 import com.atbsg.atbsg.logging.Logger;
 
-public class HowActivity extends Activity {
+/**
+ * Created by Steven on 07/02/2016.
+ *
+ * Activity to show text in the application.
+ */
+
+public class TextActivity extends Activity {
 
     private TextView mTextView;
     private boolean uniqueId = false;

@@ -1,5 +1,13 @@
 package com.atbsg.atbsg;
 
+/**
+ * Created by Steven on 15/02/2016.
+ *
+ * This class is specifically for launching the
+ * circles game and providing methods for communication
+ * between the watch and the game.
+ */
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -14,15 +22,15 @@ import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import java.util.Date;
 import java.util.Locale;
 
-public class AndroidLauncher extends AndroidApplication implements ActionResolver {
+public class GameActivity extends AndroidApplication implements PhoneGameInterface {
 	static int vertical, horizontal;
-	CloudLogger cloudLogger;
+	WatchCommunicator watchCommunicator;
 	TextToSpeech t1;
 	Logger logger;
 	private int currentGameScore = 0;
 	private String userId = "no id";
 
-	public AndroidLauncher(){
+	public GameActivity(){
 
 	}
 
@@ -52,8 +60,8 @@ public class AndroidLauncher extends AndroidApplication implements ActionResolve
 	@Override
 	protected void onCreate (Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		cloudLogger = new CloudLogger(this);
-		cloudLogger.initApi();
+		watchCommunicator = new WatchCommunicator(this);
+		watchCommunicator.initApi();
 		logger = new Logger(this);
 		t1=new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
 			@Override
@@ -96,7 +104,7 @@ public class AndroidLauncher extends AndroidApplication implements ActionResolve
 	 */
 	@Override
 	public void setVertical(int vertical) {
-		AndroidLauncher.vertical=vertical;
+		GameActivity.vertical=vertical;
 	}
 
 	/**
@@ -107,7 +115,7 @@ public class AndroidLauncher extends AndroidApplication implements ActionResolve
 	 */
 	@Override
 	public void sendToPhone(String message) {
-		cloudLogger.sendScoreToCloud(message);
+		watchCommunicator.sendToWatch(message);
 	}
 
 	/**
@@ -121,9 +129,6 @@ public class AndroidLauncher extends AndroidApplication implements ActionResolve
 			if(!logger.getMuted()) {
 				t1.speak(speech, TextToSpeech.QUEUE_FLUSH, null);
 			}
-        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            t1.speak(speech, TextToSpeech.QUEUE_FLUSH, null, null);
-        }*/
 		}catch (Exception e){
 
 		}

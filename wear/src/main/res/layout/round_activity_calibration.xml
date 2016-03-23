@@ -16,7 +16,8 @@
         android:fontFamily="sans-serif-condensed-light"
         android:lineSpacingExtra="-4sp"
         android:textColor="@color/text_color"
-        android:textSize="14sp"/>
+        android:textSize="14sp"
+        android:padding="1dp"/>
 
     <ImageView
         android:layout_width="wrap_content"

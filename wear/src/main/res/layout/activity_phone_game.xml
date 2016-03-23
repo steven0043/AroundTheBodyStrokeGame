@@ -10,9 +10,10 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Please look at your phone"
+        android:text="Please look at your phone and try to get the ball inside the circle"
         android:id="@+id/textView"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
+        android:gravity="center"
         android:textColor="#ffffff" />
 </RelativeLayout>

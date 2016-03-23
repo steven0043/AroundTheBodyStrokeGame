@@ -1,17 +1,10 @@
 <resources>
-    <string name="app_name">Around The Body Stroke Recovery Game</string>
-    <string name="hello_round">Here, I will tell you how to play!</string>
-    <string name="hello_square">Here, I will tell you how to play!</string>
-    <string name="title_activity_menu">Around The Body Stroke Recovery Game</string>
-    <string name="title_activity_how">Around The Body Stroke Game</string>
-    <string name="title_activity_progress">Around The Body Stroke Game</string>
-    <string name="title_activity_sensor">Around The Body Stroke Game</string>
-    <string name="title_activity_game_menu">Around The Body Stroke Game</string>
-    <string name="title_activity_always_on">AlwaysOnActivity</string>
-    <string name="hello_world">Hello World!</string>
-    <string name="title_activity_sensor_menu">SensorMenuActivity</string>
-    <string name="title_activity_accelerometer">AccelerometerActivity</string>
-    <string name="title_activity_gyroscope">GyroscopeActivity</string>
-    <string name="title_activity_calibration">CalibrationActivity</string>
-    <string name="title_activity_phone_game">PhoneGameActivity</string>
+    <string name="app_name">Around the Body Stroke Recovery Game</string>
+    <string name="title_activity_menu">Around the Body Stroke Recovery Game</string>
+    <string name="title_activity_how">Around the Body Stroke Recovery Game</string>
+    <string name="title_activity_progress">Around the Body Stroke Recovery Game</string>
+    <string name="title_activity_sensor">Around the Body Stroke Recovery Game</string>
+    <string name="title_activity_game_menu">Around the Body Stroke Recovery Game</string>
+    <string name="title_activity_calibration">Around the Body Stroke Recovery Game</string>
+    <string name="title_activity_phone_game">Around the Body Stroke Recovery Game</string>
 </resources>

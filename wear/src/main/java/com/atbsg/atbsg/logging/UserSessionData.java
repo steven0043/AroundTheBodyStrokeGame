@@ -1,21 +1,13 @@
 
 package com.atbsg.atbsg.logging;
 
-import android.os.Environment;
-
-import com.google.android.gms.common.api.PendingResult;
-import com.google.android.gms.wearable.Asset;
-import com.google.android.gms.wearable.DataApi;
-import com.google.android.gms.wearable.PutDataMapRequest;
-import com.google.android.gms.wearable.PutDataRequest;
-import com.google.android.gms.wearable.Wearable;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
 import java.util.HashMap;
 
+/**
+ * Created by Steven on 03/03/2016.
+ *
+ * Class that stored the hashmap of participant session data.
+ */
 public class UserSessionData {
 
     static HashMap<String, String> hm = new HashMap<String, String>();

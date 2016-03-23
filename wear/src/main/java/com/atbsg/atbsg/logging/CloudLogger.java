@@ -38,8 +38,13 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created by Steve on 13/01/2016.
+ * Created by Steven on 13/01/2016.
+ *
+ * This class is specifically for connecting and
+ * communicating with the phone.
  */
+
+
 public class CloudLogger {
     private static final long CONNECTION_TIME_OUT_MS = 100;
     private GoogleApiClient client;
@@ -100,17 +105,17 @@ public class CloudLogger {
     }
 
     public void playStartMessages(){
-        if(contextClass.equals("MenuActivity")){
+        if(contextClass.equals("ListActivity")){
            // sendScoreToCloud("Welcome to the around the body stroke recovery game. Your starting " +
                     //"options are: how to play, game modes, my progress and settings");
         }
         if(contextClass.equals("CalibrationActivity")){
             sendScoreToCloud("Before we start, look straight ahead. Then please make sure the watch face is parallel to your own face");
         }
-        if(contextClass.equals("HowActivity")){
+        if(contextClass.equals("TextActivity")){
            /* sendScoreToCloud("To play this game, strap the watch firmly on your wrist and follow the directions on screen. You can swipe right to move back a screen.");*/
         }
-        if(contextClass.equals("SensorActivity")){
+        if(contextClass.equals("ExerciseActivity")){
             //sendScoreToCloud("2game");
             sendScoreToCloud("Please move your arm up!");
         }

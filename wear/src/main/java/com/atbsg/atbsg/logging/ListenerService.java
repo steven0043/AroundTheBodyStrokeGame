@@ -2,6 +2,10 @@ package com.atbsg.atbsg.logging;
 
 /**
  * Created by Steven on 06/02/2016.
+ *
+ * Listens out for communication from the
+ * phone during the Circles Game.
+ *
  */
 
 import com.atbsg.atbsg.games.PhoneGameListener;

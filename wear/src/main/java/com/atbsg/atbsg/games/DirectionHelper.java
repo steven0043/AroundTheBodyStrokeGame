@@ -5,19 +5,21 @@ import java.util.List;
 
 /**
  * Created by Steven on 15/12/2015.
+ *
+ * Class especially for detecting the current motion of the user
+ * based on the accelerometer values
  */
 public class DirectionHelper {
 
     List<Double> horizontalHistory;
     List<Double> verticalHistory;
-    double upSum, downSum, rightSum, leftSum, highestCurrentAverage;
+    double upSum, downSum, rightSum, leftSum;
 
     public DirectionHelper(){
         upSum = 0;
         downSum = 0;
         rightSum = 0;
         leftSum = 0;
-        highestCurrentAverage = 0;
         horizontalHistory = new ArrayList<Double>();
         verticalHistory = new ArrayList<Double>();
     }
@@ -28,15 +30,11 @@ public class DirectionHelper {
      * @return boolean
      */
     public boolean goingUp(){
-        highestCurrentAverage = 0;
         upSum = 0;
 
         verticalHistory = getLastValues(verticalHistory);
 
         upSum = getAverageFromList(verticalHistory);
-
-        calculateCurrentAverage(upSum);
-        //System.out.println("UP SUM " + -sum);
 
         return upSum < -0.05;
     }
@@ -47,14 +45,11 @@ public class DirectionHelper {
      * @return boolean
      */
     public boolean goingDown(){
-        highestCurrentAverage = 0;
         downSum = 0;
 
         verticalHistory = getLastValues(verticalHistory);
 
         downSum  = getAverageFromList(verticalHistory);
-
-        calculateCurrentAverage(downSum);
 
         return downSum > 0.05;
     }
@@ -65,14 +60,11 @@ public class DirectionHelper {
      * @return boolean
      */
     public boolean goingRight() {
-        highestCurrentAverage = 0;
         rightSum = 0;
 
         horizontalHistory = getLastValues(horizontalHistory);
 
         rightSum = getAverageFromList(horizontalHistory);
-
-        calculateCurrentAverage(rightSum);
 
         return rightSum < -0.005;
     }
@@ -84,13 +76,10 @@ public class DirectionHelper {
      */
     public boolean goingLeft() {
         leftSum = 0;
-        highestCurrentAverage = 0;
 
         horizontalHistory = getLastValues(horizontalHistory);
 
         leftSum = getAverageFromList(horizontalHistory);
-
-        calculateCurrentAverage(leftSum);
 
         return leftSum > 0.005;
     }
@@ -145,19 +134,6 @@ public class DirectionHelper {
     }
 
     /**
-     * Checks to see if the current average is greater
-     * than the current highest.
-     * @param currentAverage
-     */
-    private void calculateCurrentAverage(double currentAverage){
-        double currentAvg = Math.abs(currentAverage);
-
-        if(currentAvg>highestCurrentAverage){
-            highestCurrentAverage = currentAvg;
-        }
-    }
-
-    /**
      * Get current up motion average.
      * @return double
      */
@@ -177,9 +153,4 @@ public class DirectionHelper {
      * @return double
      */
     public double getLeftAverage(){ return leftSum;}
-    /**
-     * Get current highest average.
-     * @return double
-     */
-    public double getHighestCurrentAverage(){ return highestCurrentAverage;}
 }

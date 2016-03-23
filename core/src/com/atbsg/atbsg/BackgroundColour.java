@@ -2,6 +2,9 @@ package com.atbsg.atbsg;
 
 /**
  * Created by Steven on 09/02/2016.
+ *
+ * Simple class to represent background colours
+ * used in the game.
  */
 public class BackgroundColour  {
     int r, g, b;
@@ -55,28 +58,28 @@ public class BackgroundColour  {
     }
 
     /**
-     * Quick method the get the colour to green.
+     * Quick method the set the colour to green.
      */
     public void green(){
         this.setRGB(0, 128, 0);
     }
 
     /**
-     * Quick method the get the colour to amber.
+     * Quick method the set the colour to amber.
      */
     public void amber(){
         this.setRGB(199, 136, 5);
     }
 
     /**
-     * Quick method the get the colour to blue.
+     * Quick method the set the colour to blue.
      */
     public void blue(){
-        this.setRGB(49, 160, 154);
+        this.setRGB(49, 60, 154);
     }
 
     /**
-     * Quick method the get the colour to red.
+     * Quick method the set the colour to red.
      */
     public void red(){
         this.setRGB(255, 51, 51);

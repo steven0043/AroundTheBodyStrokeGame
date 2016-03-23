@@ -13,19 +13,20 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created by Steve on 13/01/2016.
+ * Created by Steven on 13/01/2016.
+ *
+ * This class is specifically for connecting and
+ * communicating with the watch.
  */
-public class CloudLogger {
+public class WatchCommunicator {
     private static final long CONNECTION_TIME_OUT_MS = 100;
     private GoogleApiClient client;
     private String nodeId;
     private Context context;
-    private String contextClass = "";
     public boolean connected = false;
 
-    public CloudLogger(Context context){
+    public WatchCommunicator(Context context){
         this.context=context;
-        contextClass = context.getClass().getSimpleName();
     }
 
     /**
@@ -73,13 +74,11 @@ public class CloudLogger {
     /**
      * Sends message to the watch that's connected.
      */
-    public void sendScoreToCloud(final String gameMode) {
-        //System.out.println("SENDING score null");
+    public void sendToWatch(final String gameMode) {
         if (nodeId != null) {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    //System.out.println("SENDING score");
                     client.blockingConnect(CONNECTION_TIME_OUT_MS, TimeUnit.MILLISECONDS);
                     Wearable.MessageApi.sendMessage(client, nodeId, gameMode, null);
                     client.disconnect();

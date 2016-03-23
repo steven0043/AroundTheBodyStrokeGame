@@ -5,6 +5,9 @@ import java.util.Random;
 
 /**
  * Created by Steven on 12/11/2015.
+ *
+ * A helper class for the directions
+ * used in each game.
  */
 public class GameHelper {
     ArrayList<String> gameDirections = new ArrayList<String>(Arrays.asList("UP", "DOWN", "RIGHT", "LEFT"));
@@ -62,18 +65,26 @@ public class GameHelper {
     }
 
     /**
+     * Add new random direction to the current list of
+     * game directions.
+     */
+    public void addRandomDirection(){
+        gameDirections.add(this.newRandomDirection());
+        if(i == 3){
+            i=0;
+        }else {
+            i++;
+        }
+    }
+
+    /**
      * Checks if the direction parameter is the
      * next one.
      * @param direction
      * @return boolean
      */
     private boolean checkCurrent(String direction){
-        if(getNextDirections().equals(direction)){
-            return true;
-        }
-        else{
-            return false;
-        }
+        return direction.equals(getNextDirections());
     }
 
     /**
@@ -123,12 +134,7 @@ public class GameHelper {
      * @return boolean
      */
     public boolean correctDirection(String userDirection){
-        if(this.getNextDirections().equals(userDirection)){
-            return true;
-        }
-        else{
-            return false;
-        }
+        return this.getNextDirections().equals(userDirection);
     }
 
 }

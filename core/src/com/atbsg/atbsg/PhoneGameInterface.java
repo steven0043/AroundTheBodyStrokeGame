@@ -2,8 +2,10 @@ package com.atbsg.atbsg;
 
 /**
  * Created by Steven on 04/02/2016.
+ * An interface that allows communication between the Circles Game and
+ * the smartphone.
  */
-public interface ActionResolver {
+public interface PhoneGameInterface {
     public int getVertical();
     public int getHorizontal();
     public void setVertical(int vertical);

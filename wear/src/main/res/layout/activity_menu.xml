@@ -28,6 +28,6 @@
         xmlns:tools="http://schemas.android.com/tools" android:id="@+id/watch_view_stub"
         android:layout_width="match_parent" android:layout_height="match_parent"
         app:rectLayout="@layout/rect_activity_menu" app:roundLayout="@layout/round_activity_menu"
-        tools:context="com.aroundbodygame.stroke.aroundthebodystrokegame.menu.MenuActivity"
+        tools:context="com.aroundbodygame.stroke.aroundthebodystrokegame.menu.ListActivity"
         tools:deviceIds="wear"></android.support.wearable.view.WatchViewStub>
     -->

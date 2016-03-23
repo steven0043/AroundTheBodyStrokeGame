@@ -60,7 +60,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Difficulty:"
+        android:text="Welcome!"
         android:gravity="center"
         android:id="@+id/textDifficulty"
         android:fontFamily="sans-serif-condensed-light"

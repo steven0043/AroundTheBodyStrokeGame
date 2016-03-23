@@ -2,6 +2,8 @@ package com.atbsg.atbsg.games;
 
 /**
  * Created by Steven on 07/02/2016.
+ *
+ * A sensor listener for the Circles Game
  */
 
 import android.hardware.Sensor;
@@ -109,7 +111,10 @@ public class PhoneGameListener implements SensorEventListener {
      */
     public void applyUpWeighting(){
         if(mProgressStatus < verticalMax && mProgressStatus >= 0) {
-            mProgressStatus = (int) (mProgressStatus + (((-linear_acceleration[2]+ 1)*2) * (((-directionHelper.getUpAverage())) * (16-((directionHelper.getHighestCurrentAverage()/3)*4)))));
+            double highestAvgWeight =  toPositive((16-((directionHelper.getUpAverage()/3)*4)));
+            double currentAvgWeight = toPositive((-directionHelper.getUpAverage()));
+            double currentValueWeight = toPositive(((-linear_acceleration[2]+1)*2));
+            mProgressStatus = (int) (mProgressStatus + (currentValueWeight * (currentAvgWeight * highestAvgWeight)));
         }
     }
 
@@ -127,7 +132,10 @@ public class PhoneGameListener implements SensorEventListener {
      */
     public void applyDownWeighting(){
         if(mProgressStatus > 0 && mProgressStatus <= 2000) {
-            mProgressStatus = (int) (mProgressStatus - (((linear_acceleration[2]+1)*2) * (((directionHelper.getDownAverage())) * (16-((directionHelper.getHighestCurrentAverage()/3)*4)))));
+            double highestAvgWeight =  toPositive((16-((directionHelper.getDownAverage()/3)*4)));
+            double currentAvgWeight = toPositive(directionHelper.getDownAverage());
+            double currentValueWeight = toPositive(((linear_acceleration[2]+1)*2));
+            mProgressStatus = (int) (mProgressStatus - (currentValueWeight * (currentAvgWeight * highestAvgWeight)));
         }
     }
 
@@ -137,7 +145,7 @@ public class PhoneGameListener implements SensorEventListener {
      */
     public boolean goingRight(){
         return linear_acceleration[0] < -0.005 && currentPhoneMotion.equals("RIGHT")
-                && /*directionHelper.goingRight()*/ directionHelper.goingRight();
+                && directionHelper.goingRight();
     }
 
     /**
@@ -145,10 +153,9 @@ public class PhoneGameListener implements SensorEventListener {
      */
     public void applyRightWeighting(){
         if(mProgressStatus < horizontalMax && mProgressStatus >= 0) {
-            double highestAvgWeight =  Math.abs(16-((directionHelper.getHighestCurrentAverage()/3)*4));
-            double currentAvgWeight = Math.abs(-directionHelper.getRightAverage());
-            double currentValueWeight = Math.abs(((-linear_acceleration[2]+1)*2));
-            mProgressStatus = (int) (mProgressStatus + (currentValueWeight * (currentAvgWeight * highestAvgWeight)));
+            double highestAvgWeight =  toPositive(16 - ((directionHelper.getRightAverage() / 3) * 4));
+            double currentAvgWeight = toPositive(-directionHelper.getRightAverage());
+            mProgressStatus = (int) (mProgressStatus + (currentAvgWeight * (currentAvgWeight * highestAvgWeight)));
         }
     }
 
@@ -169,9 +176,8 @@ public class PhoneGameListener implements SensorEventListener {
             mProgressStatus = horizontalMax;
         }
         if(mProgressStatus > 0 && mProgressStatus <= 950) {
-            double highestAvgWeight =  Math.abs(16-((directionHelper.getHighestCurrentAverage()/3)*4));
-            double currentAvgWeight = Math.abs(directionHelper.getLeftAverage());
-            double currentValueWeight = Math.abs(((linear_acceleration[2]+ 1)*2));
+            double highestAvgWeight = toPositive(16 - ((directionHelper.getLeftAverage() / 3) * 4));
+            double currentAvgWeight = toPositive(directionHelper.getLeftAverage());
             mProgressStatus = (int) (mProgressStatus - (currentAvgWeight * (currentAvgWeight* highestAvgWeight)));
         }
     }
@@ -215,11 +221,18 @@ public class PhoneGameListener implements SensorEventListener {
     }
 
     /**
+     * Turn the double parameter to a postive number
+     * @param number
+     * @return double
+     */
+    public double toPositive(double number){
+        return Math.abs(number);
+    }
+
+    /**
      * Unregisters the accelerometer from the sensor manager.
      */
     public void unregister() {
-        //playSound("Your final score is " + score);
-        System.out.println("DESTROOOYYYEDD");
         mProgressStatus = 0;
         currentPhoneMotion = "UP";
         mSensorManager.unregisterListener(this);

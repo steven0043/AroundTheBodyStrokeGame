@@ -7,24 +7,27 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Vibrator;
 
-import com.atbsg.atbsg.logging.CloudLogger;
 import com.atbsg.atbsg.logging.Logger;
 import com.atbsg.atbsg.logging.UserSessionData;
 
 /**
  * Created by Steven on 13/12/2015.
+ *
+ * Class that listens out for the accelerometer data during the game
+ * modes on the smartwatch and through the help of other classes,
+ * updates the Exercise Activity accordingly.
  */
-public class SensorListener implements SensorEventListener {
+public class ExerciseListener implements SensorEventListener {
 
     private final SensorManager mSensorManager;
     private final Sensor mAccelerometer;
-    private final SensorActivity currentActivity;
+    private final ExerciseActivity currentActivity;
     private long lastUpdate = 0;
     private long lastDataUpdate = 0;
     final float alpha = (float) 0.8;
     private int score = 0;
-    private double[] gravity ={0,0,0};
-    private double[] linear_acceleration ={0,0,0};
+    private double[] gravity = {0,0,0};
+    private double[] linear_acceleration = {0,0,0};
     Vibrator v;
     private String direction = "";
     private Logger logger;
@@ -37,21 +40,17 @@ public class SensorListener implements SensorEventListener {
     String fileSend = "";
     String allFileSend = "";
     long tStart = System.currentTimeMillis();
-    long totalTime = System.currentTimeMillis();
     int i = UserSessionData.getMap().size();
     MagnetometerData magnetometerData;
 
-    public SensorListener(SensorManager sm, SensorActivity currentActivity, int horizontalMax, int verticalMax){
+    public ExerciseListener(SensorManager sm, ExerciseActivity currentActivity, int horizontalMax, int verticalMax){
         mSensorManager = sm;
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         this.currentActivity = currentActivity;
         this.horizontalMax = horizontalMax;
         this.verticalMax = verticalMax;
         logger = new Logger(currentActivity);
-        magnetometerData = new MagnetometerData(currentActivity);
         v = (Vibrator) currentActivity.getSystemService(Context.VIBRATOR_SERVICE);
-        fileSend = getDifficulty()+"\n";
-        allFileSend = getDifficulty()+"\n";
         mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_UI);
     }
 
@@ -70,7 +69,7 @@ public class SensorListener implements SensorEventListener {
                 removeGravity(event);
 
                 addToAverages();
-                collectUserData();
+                //collectUserData(); was used during user evaluation to collect data.
 
                 if (goingUp()) {
                     applyUpWeighting();
@@ -120,7 +119,10 @@ public class SensorListener implements SensorEventListener {
      */
     private void applyUpWeighting(){
         if(mProgressStatus < verticalMax ) {
-            mProgressStatus = (int) (mProgressStatus + (((-linear_acceleration[2]+ 1)*2) * (((-directionHelper.getUpAverage())) * (16-((directionHelper.getHighestCurrentAverage()/3)*4)))));
+            double highestAvgWeight =  toPositive((16-((directionHelper.getUpAverage()/3)*4))); //This is to help deal with accelerometer value differences across different devices
+            double currentAvgWeight = toPositive((-directionHelper.getUpAverage()));
+            double currentValueWeight = toPositive(((-linear_acceleration[2]+1)*2));
+            mProgressStatus = (int) (mProgressStatus + (currentValueWeight * (currentAvgWeight * highestAvgWeight)));
         }
         else{
             direction = "UP";
@@ -133,7 +135,10 @@ public class SensorListener implements SensorEventListener {
      */
     private void applyDownWeighting(){
         if(mProgressStatus > 0) {
-            mProgressStatus = (int) (mProgressStatus - (((linear_acceleration[2]+1)*2) * (((directionHelper.getDownAverage())) * (16-((directionHelper.getHighestCurrentAverage()/3)*4)))));
+            double highestAvgWeight =  toPositive((16-((directionHelper.getDownAverage()/3)*4)));
+            double currentAvgWeight = toPositive(directionHelper.getDownAverage());
+            double currentValueWeight = toPositive(((linear_acceleration[2]+1)*2));
+            mProgressStatus = (int) (mProgressStatus - (currentValueWeight * (currentAvgWeight * highestAvgWeight)));
         }else{
             direction = "DOWN";
             moved = true;
@@ -148,9 +153,8 @@ public class SensorListener implements SensorEventListener {
             mProgressStatus = horizontalMax;
         }
         if(mProgressStatus > 0) {
-            double highestAvgWeight =  toPositive(16 - ((directionHelper.getHighestCurrentAverage() / 3) * 4));
+            double highestAvgWeight =  toPositive(16 - ((directionHelper.getLeftAverage() / 3) * 4));
             double currentAvgWeight = toPositive(directionHelper.getLeftAverage());
-            double currentValueWeight = toPositive(((linear_acceleration[2]+ 1)*2));
             mProgressStatus = (int) (mProgressStatus - (currentAvgWeight * (currentAvgWeight* highestAvgWeight)));
         }else {
             direction = "LEFT";
@@ -163,10 +167,9 @@ public class SensorListener implements SensorEventListener {
      */
     private void applyRightWeighting(){
         if(mProgressStatus < horizontalMax) {
-            double highestAvgWeight =  toPositive(16 - ((directionHelper.getHighestCurrentAverage() / 3) * 4));
+            double highestAvgWeight =  toPositive(16 - ((directionHelper.getRightAverage() / 3) * 4));
             double currentAvgWeight = toPositive(-directionHelper.getRightAverage());
-            double currentValueWeight = toPositive(((-linear_acceleration[2] + 1) * 2) + (1/-directionHelper.getRightAverage()));
-            mProgressStatus = (int) (mProgressStatus + (currentAvgWeight * (currentAvgWeight * highestAvgWeight )));
+            mProgressStatus = (int) (mProgressStatus + (currentAvgWeight * (currentAvgWeight * highestAvgWeight)));
         }else {
             direction = "RIGHT";
             moved = true;
@@ -231,7 +234,7 @@ public class SensorListener implements SensorEventListener {
            keepCollecting = 4;
         }else {keepCollecting = 12; }
         long nowTime = System.currentTimeMillis();
-        if((nowTime - lastDataUpdate) > 300) {
+        if((nowTime - lastDataUpdate) > 500) {
             long tEnd = System.currentTimeMillis();
             long tDelta = tEnd - tStart;
             double elapsedSeconds = tDelta / 1000.0;
@@ -265,11 +268,16 @@ public class SensorListener implements SensorEventListener {
     /**
      * Check if the user has completed the current indicated direction
      */
-    public void checkCompletedMovement(){
+    private void checkCompletedMovement(){
         if(!(direction.equals("") && moved)){
             if(gameHelper.correctDirection(direction)){
-                tStart = System.currentTimeMillis();
-                gameHelper.addDirection();
+                /*
+                   The first 20 directions will follow the same pattern
+                   following this there will be some random directions included
+                   to mix it up.
+                 */
+                if((score>15)&& (score % 5 == 0)){gameHelper.addRandomDirection();}
+                else{gameHelper.addDirection();}
                 gameHelper.remove();
                 score++;
                 changeVisibility(gameHelper.getNextDirections());
@@ -296,7 +304,7 @@ public class SensorListener implements SensorEventListener {
      * Speak the current direction.
      * @param direction
      */
-    public void playSound(String direction){
+    private void playSound(String direction){
         currentActivity.addScoreToCloud(direction);
     }
 
@@ -305,7 +313,7 @@ public class SensorListener implements SensorEventListener {
      * @param number
      * @return double
      */
-    public double toPositive(double number){
+    private double toPositive(double number){
         return Math.abs(number);
     }
 
@@ -319,7 +327,7 @@ public class SensorListener implements SensorEventListener {
      * the current direction.
      * @param direction
      */
-    public void changeVisibility(String direction){
+    private void changeVisibility(String direction){
         if(direction.equals("UP") || direction.equals("DOWN")){
             currentActivity.makeHorizontalInvisible();
             currentActivity.makeVerticalVisible();
@@ -333,7 +341,7 @@ public class SensorListener implements SensorEventListener {
     /**
      * Adjust the progress value.
      */
-    public void adjustProgressValue(){
+    private void adjustProgressValue(){
         if(gameHelper.isDown()){
             mProgressStatus = verticalMax;
         }
@@ -350,54 +358,20 @@ public class SensorListener implements SensorEventListener {
      * shared preferences and unregisters the acceleromter.
      */
     public void unregister() {
-        //logger.addToUserData(allFileSend);
         if(verticalMax == 2000){
             logger.setLastEasyScore(score);
-            //cloudLogger.addEasyCompletion("JohnDoe", score);
-            //currentActivity.addScoreToCloud("easy " + score + " " + logger.getUniqueId());
-            System.out.println("Add Easy");
         }
         if(verticalMax == 4000){
             logger.setLastMediumScore(score);
-            //currentActivity.addScoreToCloud("medium " + score + " " + logger.getUniqueId());
-            System.out.println("Add Medium");
-            //cloudLogger.addMediumCompletion("JohnDoe", score);
+
         }
         if(verticalMax == 8000){
             logger.setLastHardScore(score);
-            //currentActivity.addScoreToCloud("hard " + score + " " + logger.getUniqueId());
-            System.out.println("Add Hard");
-            //cloudLogger.addHardCompletion("JohnDoe", score);
+
         }
-        long tEnd = System.currentTimeMillis();
-        long tDelta = tEnd - totalTime;
-        double elapsedSeconds = tDelta / 1000.0;
-        fileSend = fileSend + "\nTotal time spent: " + elapsedSeconds + " seconds";
-        logger.addToHashMap(Integer.toString(i), fileSend);
-        //logger.sendText();
-        //playSound("Your final score is " + score);
-        //System.out.println("DESTROOOYYYEDD");
+
         mSensorManager.unregisterListener(this);
         mSensorManager.unregisterListener(this, mAccelerometer);
-        //magnetometerData.unregister();
         mSensorManager.flush(this);
-    }
-
-    public int getI(){
-        return i;
-    }
-    private String getDifficulty(){
-        if(verticalMax == 2000){
-            return "EASY";
-        }
-        else if(verticalMax == 4000){
-            return "MEDIUM";
-        }
-        else if(verticalMax == 8000){
-            return "HARD";
-        }else{
-            return "";
-        }
-
     }
 }

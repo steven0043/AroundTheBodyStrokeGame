@@ -1,4 +1,4 @@
-<com.atbsg.atbsg.menu.WearableListItemLayout
+<com.atbsg.atbsg.menu.WearableList
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:gravity="center_vertical"
     android:layout_width="match_parent"
@@ -19,4 +19,4 @@
         android:lineSpacingExtra="-4sp"
         android:textColor="@color/text_color"
         android:textSize="16sp"/>
-</com.atbsg.atbsg.menu.WearableListItemLayout>
+</com.atbsg.atbsg.menu.WearableList>

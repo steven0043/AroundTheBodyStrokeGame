@@ -2,15 +2,21 @@ package com.atbsg.atbsg;
 
 
 import com.badlogic.gdx.Game;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
+/**
+ * Created by Steven on 09/02/2016.
+ *
+ * Class that's called to start the Circles Game.
+ *
+ */
+
 public class ATBSG extends Game {
-	public ActionResolver actionResolver;
+	public PhoneGameInterface phoneGameInterface;
 	public SpriteBatch batch;
 
-	public ATBSG(ActionResolver actionResolver){
-		this.actionResolver = actionResolver;
+	public ATBSG(PhoneGameInterface phoneGameInterface){
+		this.phoneGameInterface = phoneGameInterface;
 	}
 
 	/**

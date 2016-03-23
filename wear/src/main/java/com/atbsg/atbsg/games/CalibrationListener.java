@@ -2,6 +2,9 @@ package com.atbsg.atbsg.games;
 
 /**
  * Created by Steven on 13/01/2016.
+ *
+ * Class that gets the accelerometer data during the calibration
+ * phase to help get the user into position for playing games.
  */
 
 import android.hardware.Sensor;
@@ -79,7 +82,6 @@ public class CalibrationListener implements SensorEventListener {
      * Unregisters the accelerometer from the sensor manager.
      */
     public void unregister() {
-        System.out.println("DESTROOOYYYEDD");
         mSensorManager.unregisterListener(this);
         mSensorManager.unregisterListener(this, mAccelerometer);
         mSensorManager.flush(this);

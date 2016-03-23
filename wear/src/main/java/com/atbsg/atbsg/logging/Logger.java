@@ -9,7 +9,10 @@ import com.atbsg.atbsg.logging.CloudLogger;
 import java.util.Random;
 
 /**
- * Created by Steve on 21/12/2015.
+ * Created by Steven on 21/12/2015.
+ *
+ * This class is specifically for local storage for
+ * scores and user preferences on the smartwatch.
  */
 public class Logger {
 
@@ -28,12 +31,10 @@ public class Logger {
 
     public Logger(Activity acc) {
         prefs = acc.getSharedPreferences(
-                "com.example.app", Context.MODE_PRIVATE);
+                "com.atbsg.atbsg", Context.MODE_PRIVATE);
         cloudLogger = new CloudLogger(acc);
         cloudLogger.initApi();
-        //acc.getSharedPreferences("com.example.app", 0).edit().clear().commit();
     }
-
 
     public void addToHashMap(String key, String value){
         cloudLogger.addToHashMap(key, value);

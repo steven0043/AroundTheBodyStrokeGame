@@ -6,6 +6,9 @@ import android.content.SharedPreferences;
 
 /**
  * Created by Steven on 01/02/2016.
+ *
+ * This class is specifically for local storage for
+ * scores and user preferences on the smartphone
  */
 public class Logger {
 
@@ -15,7 +18,7 @@ public class Logger {
 
     public Logger(Activity acc) {
         prefs = acc.getSharedPreferences(
-                "com.example.app", Context.MODE_PRIVATE);
+                "com.atbsg.atbsg", Context.MODE_PRIVATE);
     }
 
     /**

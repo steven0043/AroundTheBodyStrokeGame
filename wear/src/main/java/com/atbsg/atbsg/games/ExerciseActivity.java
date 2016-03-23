@@ -17,20 +17,27 @@ import com.atbsg.atbsg.logging.CloudLogger;
 
 import java.util.ArrayList;
 
-public class SensorActivity extends WearableActivity  {
+/**
+ * Created by Steven.
+ *
+ * Activity that represents the game modes on the smartwatch.
+ * Contains the progress bars.
+ *
+ */
+
+public class ExerciseActivity extends WearableActivity  {
 
     public TextView mTextView;
     boolean textBool = false;
-    private SensorListener sensorListener;
+    private ExerciseListener exerciseListener;
     private ProgressBar mProgress, mProgressHorizontal;
     private boolean updatedMaximums = false;
     GameHelper gameHelper = new GameHelper();
-    long lastUpdate;
     int horizontalMax = 1000;
     int verticalMax = 2000;
     public CloudLogger cloudLogger;
 
-    public SensorActivity(){
+    public ExerciseActivity(){
 
     }
 
@@ -60,7 +67,6 @@ public class SensorActivity extends WearableActivity  {
                 mProgressHorizontal = (ProgressBar) findViewById(R.id.progressBar2);
                 Drawable draw = getResources().getDrawable(R.drawable.custom_progressbar);
                 Drawable hozDraw = getResources().getDrawable(R.drawable.custom_progressbarhorizontal);
-                // set the drawable as progress drawable
                 mProgress.setProgressDrawable(draw);
                 mProgressHorizontal.setProgressDrawable(hozDraw);
                 mProgressHorizontal.setMax(horizontalMax);
@@ -73,7 +79,7 @@ public class SensorActivity extends WearableActivity  {
         });
         runOnUiThread(new Runnable() {
             public void run() {
-                sensorListener = new SensorListener((SensorManager) getSystemService(Context.SENSOR_SERVICE), SensorActivity.this, horizontalMax, verticalMax);
+                exerciseListener = new ExerciseListener((SensorManager) getSystemService(Context.SENSOR_SERVICE), ExerciseActivity.this, horizontalMax, verticalMax);
             }
         });
     }
@@ -86,7 +92,6 @@ public class SensorActivity extends WearableActivity  {
     protected void setmTextView(ArrayList<String> directions, int score) {
         mTextView.setText("");
         mTextView.setText(directions.get(0) + " | " + score);
-       //mProgress.setVisibility(View.INVISIBLE);
     }
 
     /**
@@ -96,10 +101,6 @@ public class SensorActivity extends WearableActivity  {
      */
     protected void updateProgressBar(int mProgressStatus){
         final int mProgressStatuss = mProgressStatus;
-
-        //long curTime = System.currentTimeMillis();
-
-        //System.out.println(" UPDATE " + (curTime - lastUpdate));
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -112,8 +113,6 @@ public class SensorActivity extends WearableActivity  {
                 }
             }
         });
-        //lastUpdate = curTime;
-
     }
 
     /**
@@ -202,7 +201,6 @@ public class SensorActivity extends WearableActivity  {
 
     @Override
     protected void onPause() {
-        System.out.println("PAUSEESEDDD");
         super.onPause();
     }
 
@@ -211,7 +209,7 @@ public class SensorActivity extends WearableActivity  {
      */
     @Override
     protected void onDestroy() {
-        sensorListener.unregister();
+        exerciseListener.unregister();
         finish();
         super.onDestroy();
     }

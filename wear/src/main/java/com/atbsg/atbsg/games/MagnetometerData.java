@@ -8,6 +8,9 @@ import android.hardware.SensorManager;
 
 /**
  * Created by Steven on 29/02/2016.
+ *
+ * This class was used during the user evaluation
+ * for comparison between magnetometer data and accelerometer data.
  */
 public class MagnetometerData implements SensorEventListener {
 

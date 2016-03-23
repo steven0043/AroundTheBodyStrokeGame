@@ -14,23 +14,24 @@ import android.widget.TextView;
 
 import com.atbsg.atbsg.R;
 import com.atbsg.atbsg.logging.CloudLogger;
-import com.atbsg.atbsg.menu.MenuActivity;
-//import com.aroundbodygame.stroke.aroundthebodystrokegame.games.SensorActivity;
+import com.atbsg.atbsg.menu.ListActivity;
 
+/**
+ * Created by Steven.
+ *
+ * Activity used to show the screen used during
+ * the calibration screen.
+ */
 
 public class CalibrationActivity extends WearableActivity {
 
     public TextView mTextView;
     public ImageView imageView;
-    private long lastUpdate = 0;
-    private int holdTime;
     boolean textBool = false;
-    long hold = 0;
     private boolean calibrateClick = false;
     private boolean gameStarted = false;
     private boolean spoken = false;
     public CalibrationListener sensorListener;
-    GameHelper gameHelper = new GameHelper();
     CloudLogger cloudLogger;
 
     public CalibrationActivity(){
@@ -108,7 +109,7 @@ public class CalibrationActivity extends WearableActivity {
                 if (calibrateClick) {
                     //sensorListener.unregister();
                     System.out.println("Clicked tick");
-                    Intent intent = new Intent(CalibrationActivity.this, SensorActivity.class);
+                    Intent intent = new Intent(CalibrationActivity.this, ExerciseActivity.class);
                     startActivity(intent);
                     finish();
                 }
@@ -126,7 +127,7 @@ public class CalibrationActivity extends WearableActivity {
             Bundle b=new Bundle();
             b.putStringArray("listItems", new String[]{"Easy", "Medium", "Hard"});
             cloudLogger.sendScoreToCloud("Your game options are: easy, medium and hard");
-            Intent intent = new Intent(this, MenuActivity.class);
+            Intent intent = new Intent(this, ListActivity.class);
             intent.putExtras(b);
             startActivity(intent);
             finish();

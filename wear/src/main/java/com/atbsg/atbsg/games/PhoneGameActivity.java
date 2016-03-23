@@ -15,10 +15,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+/**
+ * Created by Steven on 07/02/2016.
+ */
 public class PhoneGameActivity extends WearableActivity {
 
-
-    private TextView mTextView;
     public CloudLogger cloudLogger;
     private PhoneGameListener sensorListener;
 
@@ -29,7 +30,6 @@ public class PhoneGameActivity extends WearableActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_phone_game);
         setAmbientEnabled();
-        mTextView = (TextView) findViewById(R.id.text);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         runOnUiThread(new Runnable() {
             public void run() {

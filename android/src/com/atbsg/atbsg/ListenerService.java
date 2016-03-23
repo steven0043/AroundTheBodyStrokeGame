@@ -2,63 +2,35 @@ package com.atbsg.atbsg;
 
 /**
  * Created by Steven on 25/01/2016.
+ *
+ * This class is for receiving messages and data from the watch.
  */
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.media.MediaScannerConnection;
-import android.os.Bundle;
-import android.os.Environment;
-import android.util.Log;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.wearable.Asset;
 import com.google.android.gms.wearable.DataEvent;
 import com.google.android.gms.wearable.DataEventBuffer;
 import com.google.android.gms.wearable.DataItem;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.MessageEvent;
-import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
-
 
 public class ListenerService extends WearableListenerService {
     boolean scoreAdded = false;
     String userId = "no id";
-    private String file = "mydata";
-/*    GoogleApiClient mGoogleApiClient = new GoogleApiClient.Builder(this)
-            .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
-                @Override
-                public void onConnected(Bundle connectionHint) {
-                    // Now you can use the Data Layer API
-                }
-                @Override
-                public void onConnectionSuspended(int cause) {
-                }
-            })
-            .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
-                @Override
-                public void onConnectionFailed(ConnectionResult result) {
-
-                }
-            })
-                    // Request access only to the Wearable API
-            .addApi(Wearable.API)
-            .build();*/
+    private static final String PROGRESS_MESSAGE_KEY = "1";
+    private static final String MODE_MESSAGE_KEY = "2";
+    private static final String GAME_MESSAGE_KEY = "3";
+    private static final String CLOSE_GAME_MESSAGE_KEY = "4";
 
     /**
      * Method that receives messages from the watch.
@@ -67,22 +39,22 @@ public class ListenerService extends WearableListenerService {
     @Override
     public void onMessageReceived(MessageEvent messageEvent) {
         try {
-            System.out.println("Called " + messageEvent.getPath() );
+            System.out.println("Called " + messageEvent.getPath());
             String direction = "";
             int progress = 0;
             addScore(messageEvent.getPath());
-            if (!scoreAdded && messageEvent.getPath().startsWith("1")) {
+            if (!scoreAdded && messageEvent.getPath().startsWith(PROGRESS_MESSAGE_KEY)) {
                 progress = ByteBuffer.wrap(messageEvent.getData()).order(ByteOrder.LITTLE_ENDIAN).getInt(); // Byte array to integer
                 direction = messageEvent.getPath().substring(1); //Get direction
                 String score = direction.replaceAll("\\D+","");
                 direction = direction.replaceAll("\\d","");
+                System.out.println("Updating");
                 MainActivity.updateProgressBar(direction, score, progress); //Update the UI
             }
-            else if (!scoreAdded && messageEvent.getPath().startsWith("2")) {
+            else if (!scoreAdded && messageEvent.getPath().startsWith(MODE_MESSAGE_KEY)) {
                 System.out.println("MODE " + messageEvent.getPath());
                 String gameMode = messageEvent.getPath().substring(1);
                 if(gameMode.equals("game")){
-                    System.out.println("LAUNCHING");
                     MainActivity.playGame();
                 }
                 if(gameMode.equals("EASY")){
@@ -94,23 +66,18 @@ public class ListenerService extends WearableListenerService {
                 if(gameMode.equals("HARD")){
                     MainActivity.setMaximums(gameMode, 4000, 8000);
                 }
-            }else if (!scoreAdded && messageEvent.getPath().startsWith("3")) {
+            }else if (!scoreAdded && messageEvent.getPath().startsWith(GAME_MESSAGE_KEY)) {
                 progress = ByteBuffer.wrap(messageEvent.getData()).order(ByteOrder.LITTLE_ENDIAN).getInt();
                 direction = messageEvent.getPath().substring(1);
                 String score = direction.replaceAll("\\D+","");
                 direction = direction.replaceAll("\\d","");
                 if(isDirectionVertical(direction)) {
-                    AndroidLauncher.updateVertical(progress);
+                    GameActivity.updateVertical(progress);
                 }else{
-                    AndroidLauncher.updateHorizontal(progress);
+                    GameActivity.updateHorizontal(progress);
                 }
             }
-            else if (!scoreAdded && messageEvent.getPath().startsWith("4")) {
-               /* Intent intent = new Intent("close");
-                Bundle b=new Bundle();
-                b.putString("userId", userId);
-                intent.putExtras(b);
-                getApplicationContext().sendBroadcast(intent);*/
+            else if (!scoreAdded && messageEvent.getPath().startsWith(CLOSE_GAME_MESSAGE_KEY)) {
                 sendBroadcast(new Intent("close"));
             }
             else{
@@ -131,22 +98,18 @@ public class ListenerService extends WearableListenerService {
         String[] splitMessage = message.split(" ");
         if(splitMessage.length==3) {
             String mode = splitMessage[0];
-            System.out.println("mode is " + mode);
             int score = Integer.parseInt(splitMessage[1]);
             userId = splitMessage[2];
 
             MainActivity.setUserId(userId);
             scoreAdded = true;
             if (mode.contains("easy")) {
-                System.out.println("Adding easy");
                 new ScorePoster().execute(userId, Integer.toString(score), new Date().toString(), "Easy");
             }
             if (mode.contains("medium")) {
-                System.out.println("Adding medium" );
                 new ScorePoster().execute(userId, Integer.toString(score), new Date().toString(), "Medium");
             }
             if (mode.contains("hard")) {
-                System.out.println("Adding hard" );
                 new ScorePoster().execute(userId, Integer.toString(score), new Date().toString(), "Hard");
             }
         }
@@ -161,15 +124,23 @@ public class ListenerService extends WearableListenerService {
         MainActivity.speak(sound);
     }
 
+    /**
+     * Check if message sent is vertical.
+     * @param message
+     * @return boolean
+     */
     private boolean isDirectionVertical(String message){
-        if(message.equals("UP") || message.equals("DOWN")){
-            return true;
-        }else{
-            return false;
-        }
+        return message.equals("UP") || message.equals("DOWN");
     }
 
-    public HashMap<String, String> fromDataMap(DataMap dataMap) {
+    /**
+     * This method takes is specifically for the evaluation data.
+     * It takes in a DataMap sent from the watch, translates it to a
+     * hashmap and saves file using the hashmap values.
+     * @param dataMap
+     * @return
+     */
+    public void saveFile(DataMap dataMap) {
         HashMap<String, String> hashMap = new HashMap<String, String>();
         String fileString = "";
 
@@ -183,22 +154,15 @@ public class ListenerService extends WearableListenerService {
             File path = getApplicationContext().getExternalFilesDir(null);
             File file = new File(path, "user"+generateUnique(4));
             FileOutputStream stream = new FileOutputStream(file);
-            System.out.println("FILING" + path.getAbsolutePath());
             try {
                 stream.write(fileString.getBytes());
             } finally {
                 stream.close();
             }
-           /* FileOutputStream fOut = null;
-
-            fOut = this.openFileOutput(generateUnique(3),MODE_WORLD_READABLE);
-            fOut.write(fileString.getBytes());
-            fOut.close();
-            System.out.println("FILING" + this.getFilesDir());*/}
+           }
         catch (Exception e) {
             e.printStackTrace();
         }
-        return hashMap;
     }
 
     /**
@@ -215,74 +179,20 @@ public class ListenerService extends WearableListenerService {
         return sb.toString();
     }
 
+    /**
+     * Method for user evaluation phase, listens out for the data
+     * containing the users time statistics.
+     * @param dataEvents
+     */
     @Override
     public void onDataChanged(DataEventBuffer dataEvents) {
-        System.out.println("DATA CHANGED");
         for (DataEvent event : dataEvents) {
             if (event.getType() == DataEvent.TYPE_CHANGED) {
-                // DataItem changed
-                    System.out.println("IN CHANGED");
                     DataItem item = event.getDataItem();
                     DataMap dataMap = DataMapItem.fromDataItem(item).getDataMap();
-                    HashMap hm = fromDataMap(dataMap);
+                    saveFile(dataMap);
                     MainActivity.speak("I Just saved the file.");
-            } else if (event.getType() == DataEvent.TYPE_DELETED) {
-                // DataItem deleted
-                System.out.println("DELETED");
             }
         }
-
-        /*MainActivity.speak("MAKING FILE");
-        System.out.println("DATA");*/
-       /* for (DataEvent event : dataEvents) {
-            if (event.getType() == DataEvent.TYPE_CHANGED &&
-                    event.getDataItem().getUri().getPath().equals("/txt"))
-            {
-                // Get the Asset object
-                DataMapItem dataMapItem = DataMapItem.fromDataItem(event.getDataItem());
-                Asset asset = dataMapItem.getDataMap().getAsset("com.example.company.key.TXT");
-
-                ConnectionResult result =
-                        mGoogleApiClient.blockingConnect(10000, TimeUnit.MILLISECONDS);
-                if (!result.isSuccess()) {return;}
-
-                // Convert asset into a file descriptor and block until it's ready
-                InputStream assetInputStream = Wearable.DataApi.getFdForAsset(
-                        mGoogleApiClient, asset).await().getInputStream();
-                mGoogleApiClient.disconnect();
-                if (assetInputStream == null) { return; }
-
-                // Get folder for output
-                MainActivity.speak("MAKING FILE");
-                File sdcard = Environment.getDataDirectory();
-                File dir = new File(sdcard.getAbsolutePath() + "/MyAppFolder/");
-                if (!dir.exists()) { dir.mkdirs(); } // Create folder if needed
-
-                // Read data from the Asset and write it to a file on external storage
-                final File file = new File(dir, "test.txt");
-                try {
-                    FileOutputStream fOut = new FileOutputStream(file);
-                    int nRead;
-                    byte[] data = new byte[16384];
-                    while ((nRead = assetInputStream.read(data, 0, data.length)) != -1) {
-                        fOut.write(data, 0, nRead);
-                    }
-
-                    fOut.flush();
-                    fOut.close();
-                }
-                catch (Exception e)
-                {
-                }
-
-                // Rescan folder to make it appear
-                try {
-                    String[] paths = new String[1];
-                    paths[0] = file.getAbsolutePath();
-                    MediaScannerConnection.scanFile(this, paths, null, null);
-                } catch (Exception e) {
-                }
-            }
-        }*/
     }
 }
