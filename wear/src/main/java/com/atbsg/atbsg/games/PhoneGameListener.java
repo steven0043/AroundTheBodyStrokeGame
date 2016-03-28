@@ -12,6 +12,8 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 
+import com.atbsg.atbsg.logging.Logger;
+
 public class PhoneGameListener implements SensorEventListener {
 
     private final SensorManager mSensorManager;
@@ -26,9 +28,12 @@ public class PhoneGameListener implements SensorEventListener {
     int horizontalMax = 950;
     int verticalMax = 2000;
     public static String currentPhoneMotion = "UP";
+    Logger logger;
 
     public PhoneGameListener(SensorManager sm, PhoneGameActivity currentActivity){
         this.currentActivity = currentActivity;
+        logger = new Logger(currentActivity);
+        logger.initialiseCommunication();
         mSensorManager = sm;
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_UI);
@@ -234,6 +239,7 @@ public class PhoneGameListener implements SensorEventListener {
      * Unregisters the accelerometer from the sensor manager.
      */
     public void unregister() {
+        logger.endCirclesGame();
         mProgressStatus = 0;
         currentPhoneMotion = "UP";
         mSensorManager.unregisterListener(this);

@@ -222,6 +222,13 @@ public class Logger {
     }
 
     /**
+     * Ends the circles game played on the phone
+     */
+    public void endCirclesGame(){
+        cloudLogger.sendToPhone("4");
+    }
+
+    /**
      * Generate a unique I.D.
      * @param len
      * @return String

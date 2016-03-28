@@ -21,9 +21,9 @@ public class ListenerService extends WearableListenerService {
     @Override
     public void onMessageReceived(MessageEvent messageEvent) {
         if(messageEvent.getPath().equals("reset")){
-            PhoneGameListener.reset();
+            PhoneGameListener.reset(); //Tells the phone game listener to reset its values
         }else{
-            PhoneGameListener.setPhoneDirection(messageEvent.getPath());
+            PhoneGameListener.setPhoneDirection(messageEvent.getPath()); //Tells the phone game listener the new direction
         }
     }
 }
