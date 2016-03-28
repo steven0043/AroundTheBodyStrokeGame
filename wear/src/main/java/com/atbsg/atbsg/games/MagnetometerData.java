@@ -16,7 +16,7 @@ public class MagnetometerData implements SensorEventListener {
 
     private SensorManager mSensorManager;
     private Sensor mMagnetometer;
-    public double[] magentometer ={0,0,0};
+    public double[] magnetometer ={0,0,0};
     private long lastUpdate = 0;
 
     public MagnetometerData(Context context){
@@ -48,23 +48,23 @@ public class MagnetometerData implements SensorEventListener {
      * Update the phones view to reflect the progress values, direction and score.
      */
     private void addMagnetometer(SensorEvent event){
-        magentometer[0] = event.values[0];
-        magentometer[1] = event.values[1];
-        magentometer[2] = event.values[2];
+        magnetometer[0] = event.values[0];
+        magnetometer[1] = event.values[1];
+        magnetometer[2] = event.values[2];
     }
 
-    public double[] getMagentometer(){
-        return magentometer;
+    public double[] getMagnetometer(){
+        return magnetometer;
     }
 
     public double getX(){
-        return magentometer[0];
+        return magnetometer[0];
     }
     public double getY(){
-        return magentometer[1];
+        return magnetometer[1];
     }
     public double getZ(){
-        return magentometer[2];
+        return magnetometer[2];
     }
 
     public void register(){

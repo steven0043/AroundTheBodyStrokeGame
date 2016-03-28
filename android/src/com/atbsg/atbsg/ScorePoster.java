@@ -22,7 +22,7 @@ public class ScorePoster extends AsyncTask<String,Void,String>{
     }
 
     /**
-     * Sends the scores to the MySQL database.
+     * Sends the scores to the MySQL database in the background.
      * @param arg0
      * @return
      */
@@ -31,25 +31,23 @@ public class ScorePoster extends AsyncTask<String,Void,String>{
         try{
             String userId = (String)arg0[0];
             String score = (String)arg0[1];
-            String time = (String)arg0[2];
-            String mode = (String)arg0[3];
+            String mode = (String)arg0[2];
 
-            String link="https://devweb2014.cis.strath.ac.uk/~emb12161/WAD/ATBSG/atbsginsert.php";
-            String data  = URLEncoder.encode("userId", "UTF-8") + "=" + URLEncoder.encode(userId, "UTF-8");
-            data += "&" + URLEncoder.encode("score", "UTF-8") + "=" + URLEncoder.encode(score, "UTF-8");
-            data += "&" + URLEncoder.encode("time", "UTF-8") + "=" + URLEncoder.encode(time, "UTF-8");
-            data += "&" + URLEncoder.encode("mode", "UTF-8") + "=" + URLEncoder.encode(mode, "UTF-8");
+            String link="https://devweb2014.cis.strath.ac.uk/~emb12161/WAD/ATBSG/atbsginsert.php"; //The link to the php script that inserts the game daat
+            String parameters  = URLEncoder.encode("userId", "UTF-8") + "=" + URLEncoder.encode(userId, "UTF-8");
+            parameters += "&" + URLEncoder.encode("score", "UTF-8") + "=" + URLEncoder.encode(score, "UTF-8");
+            parameters += "&" + URLEncoder.encode("mode", "UTF-8") + "=" + URLEncoder.encode(mode, "UTF-8"); //Encode the game data
 
             URL url = new URL(link);
-            URLConnection conn = url.openConnection();
+            URLConnection urlConnection = url.openConnection(); //Open connection to the php page
 
-            conn.setDoOutput(true);
-            OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+            urlConnection.setDoOutput(true);
+            OutputStreamWriter wr = new OutputStreamWriter(urlConnection.getOutputStream());
 
-            wr.write( data );
+            wr.write(parameters); //Write the encoded parameters
             wr.flush();
 
-            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
 
             StringBuilder sb = new StringBuilder();
             String line = null;

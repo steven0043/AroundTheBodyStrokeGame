@@ -43,7 +43,6 @@ public class WatchCommunicator {
      * @return the created Google API client
      */
     private GoogleApiClient getGoogleApiClient(Context context) {
-        System.out.println("Initializing!!!");
         return new GoogleApiClient.Builder(context)
                 .addApi(Wearable.API)
                 .build();
@@ -64,7 +63,6 @@ public class WatchCommunicator {
                 if (nodes.size() > 0) {
                     nodeId = nodes.get(0).getId();
                     connected = true;
-                    //System.out.println("CONNECTED!!! " + nodeId);
                 }
                 client.disconnect();
             }

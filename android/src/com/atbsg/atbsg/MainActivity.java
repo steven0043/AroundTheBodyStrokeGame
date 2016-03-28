@@ -31,7 +31,6 @@ import java.util.Locale;
  */
 
 public class MainActivity extends AppCompatActivity{
-    static TextToSpeech t1;
     private static ProgressBar mProgress, mProgressHorizontal;
     public static TextView mTextView, mTextViewDifficulty;
     int horizontalMax = 1000;
@@ -39,11 +38,12 @@ public class MainActivity extends AppCompatActivity{
     int verticalMax = 2000;
     private static Logger logger;
     public static GameActivity game = new GameActivity();
-    static Context mContext;
+    private static Context mContext;
     private boolean ethics = false;
+    private static boolean maximumsSet = false;
     private static String userId = "no id";
+    static TextToSpeech t1;
     private final String webService = "https://devweb2014.cis.strath.ac.uk/~emb12161/WAD/ATBSG/ATBSG.php";
-    private final String questions = "http://goo.gl/forms/0visKu0syl";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,13 +92,13 @@ public class MainActivity extends AppCompatActivity{
         final int mProgressStatuss = mProgressStatus;
         if((direction.equals("UP") || direction.equals("DOWN"))){
             mProgress.setProgress(mProgressStatuss);
-            if(mProgressStatuss > mProgress.getMax()+800){
+            if(mProgressStatuss > mProgress.getMax()+800 && !maximumsSet){
                 mProgress.setMax(mProgress.getMax()*2);
             }
         }
         if((direction.equals("LEFT") || direction.equals("RIGHT"))){
             mProgressHorizontal.setProgress(mProgressStatuss);
-            if(mProgressStatus > mProgressHorizontal.getMax()+800){
+            if(mProgressStatus > mProgressHorizontal.getMax()+800 && !maximumsSet){
                 mProgressHorizontal.setMax(mProgressHorizontal.getMax()*2);
             }
         }
@@ -106,9 +106,8 @@ public class MainActivity extends AppCompatActivity{
         if(!mTextView.getText().equals(direction)){
 
             mTextView.setText(direction + " | " + score);}
-        //lastUpdate = curTime;
-
     }
+
 
     /**
      * Sets the maximums on the progress dialog based on the
@@ -118,6 +117,7 @@ public class MainActivity extends AppCompatActivity{
      * @param verticalMax
      */
     protected static void setMaximums(String gameMode, int horizontalMax, int verticalMax ) {
+        maximumsSet = true;
         mProgressHorizontal.setMax(horizontalMax);
         mProgress.setMax(verticalMax);
         currentMode = gameMode;
@@ -171,6 +171,9 @@ public class MainActivity extends AppCompatActivity{
         if(id==R.id.highScore){
             circlesGameHighScore();
         }
+        if(id==R.id.info){
+            appInfo();
+        }
         if(id==R.id.webService){
             Uri uri = Uri.parse(webService);
             startActivity(new Intent(Intent.ACTION_VIEW, uri));
@@ -216,9 +219,6 @@ public class MainActivity extends AppCompatActivity{
             if(!logger.getMuted()) {
                 t1.speak(speech, TextToSpeech.QUEUE_FLUSH, null);
             }
-        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            t1.speak(speech, TextToSpeech.QUEUE_FLUSH, null, null);
-        }*/
         }catch (Exception e){
 
         }
@@ -301,7 +301,8 @@ public class MainActivity extends AppCompatActivity{
     private void circlesGameHighScore(){
         new AlertDialog.Builder(this)
                 .setTitle("Circles Game High Score")
-                .setMessage("Your high score is: " + logger.getGameHighScore())
+                .setMessage("User I.D. - " + userId + "\nYour high score is: " + logger.getGameHighScore()+
+                        "\nYour last score was: " + logger.getGameLastScore())
                 .show();
     }
 
@@ -320,6 +321,20 @@ public class MainActivity extends AppCompatActivity{
                     }
 
                 })
+                .show();
+    }
+
+    /**
+     * A dialog that shows information regarding the circles game.
+     */
+    private void appInfo(){
+        new AlertDialog.Builder(this)
+                .setTitle("How to Play")
+                .setMessage(("This application acts as a second screen for the application on your smartwatch" +
+                        " please go to the smartwatch application.\n\n" +
+                        "For voice commands you must say the name of the option as it appears on the smartwatch.\n" +
+                        "You can say 'back' to go back a screen.\n" + "You can say 'what are my options' to hear your voice command options.\n\n" +
+                        "You can mute the in app voice by checking the mute button in the menu."))
                 .show();
     }
 

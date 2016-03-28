@@ -204,7 +204,7 @@ public class GameScreen implements Screen {
     public void holdIt(){
         if(((curTime - lastUpdate) > 100) && updateBool) {
             /* Tell the user to hold there arm steady if ball is inside ball */
-            if(!spoken && spokenCounter < 3) {
+            if(!spoken && spokenCounter < 1) {
                 spokenCounter++;
                 speak("Hold it there");
                 spoken = true;

@@ -15,6 +15,7 @@ public class Logger {
     SharedPreferences prefs;
     final static String mutedKey = "muted";
     final static String gameKey = "game";
+    final static String gameLastKey = "gameLast";
 
     public Logger(Activity acc) {
         prefs = acc.getSharedPreferences(
@@ -47,7 +48,8 @@ public class Logger {
      * @param score
      */
     public void setGameHighScore(int score){
-        prefs.edit().putInt(gameKey, score).apply();
+        String currentUser = MainActivity.getUserId();
+        prefs.edit().putInt(gameKey + currentUser, score).apply();
     }
 
     /**
@@ -55,11 +57,29 @@ public class Logger {
      * @return highScore
      */
     public int getGameHighScore() {
-
-        int highScore = prefs.getInt(gameKey, 0);
+        String currentUser = MainActivity.getUserId();
+        int highScore = prefs.getInt(gameKey + currentUser, 0);
 
         return highScore;
     }
 
+    /**
+     * Sets the circles game latest score.
+     * @param score
+     */
+    public void setGameLastScore(int score){
+        String currentUser = MainActivity.getUserId();
+        prefs.edit().putInt(gameLastKey+currentUser, score).apply();
+    }
+
+    /**
+     * Get the circle games latest score.
+     * @return highScore
+     */
+    public int getGameLastScore() {
+        String currentUser = MainActivity.getUserId();
+        int highScore = prefs.getInt(gameLastKey+currentUser, 0);
+        return highScore;
+    }
 
 }

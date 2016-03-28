@@ -40,13 +40,11 @@ public class CalibrationListener implements SensorEventListener {
     public void onSensorChanged(SensorEvent event) {
 
         float yAcc = 0;
-        System.out.println("STILL LISTENING !!");
         long curTime = System.currentTimeMillis();
         if((curTime - lastUpdate) > 90) {
             yAcc = event.values[1];
             checkCalibration(yAcc);
             lastUpdate = curTime;
-            System.out.println("STILL LISTENING !!");
         }
     }
 

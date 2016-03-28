@@ -20,7 +20,6 @@ public class ListenerService extends WearableListenerService {
      */
     @Override
     public void onMessageReceived(MessageEvent messageEvent) {
-        System.out.println("Called wear" + messageEvent.getPath());
         if(messageEvent.getPath().equals("reset")){
             PhoneGameListener.reset();
         }else{

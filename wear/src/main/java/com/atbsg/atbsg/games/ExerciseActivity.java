@@ -1,5 +1,6 @@
 package com.atbsg.atbsg.games;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.hardware.SensorManager;
@@ -13,6 +14,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.atbsg.atbsg.R;
+import com.atbsg.atbsg.how.MyApplication;
 import com.atbsg.atbsg.logging.CloudLogger;
 
 import java.util.ArrayList;
@@ -36,6 +38,7 @@ public class ExerciseActivity extends WearableActivity  {
     int horizontalMax = 1000;
     int verticalMax = 2000;
     public CloudLogger cloudLogger;
+    protected MyApplication myApplication;
 
     public ExerciseActivity(){
 
@@ -49,7 +52,8 @@ public class ExerciseActivity extends WearableActivity  {
 
         cloudLogger = new CloudLogger(this);
         cloudLogger.initApi();
-        updatePhoneMaximums();
+        //updatePhoneMaximums();
+        myApplication = (MyApplication)this.getApplicationContext();
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             horizontalMax = extras.getInt("horizontalMax");
@@ -148,7 +152,7 @@ public class ExerciseActivity extends WearableActivity  {
      * @param score
      */
     public void addScoreToCloud(String score){
-        cloudLogger.sendScoreToCloud(score);
+        cloudLogger.sendToPhone(score);
     }
 
     /**
@@ -197,11 +201,22 @@ public class ExerciseActivity extends WearableActivity  {
     @Override
     protected void onResume() {
         super.onResume();
+        myApplication.setCurrentActivity(this);
     }
 
     @Override
     protected void onPause() {
+        clearCurrentActivity();
         super.onPause();
+    }
+
+    /**
+     *Clear the current activity reference
+     */
+    private void clearCurrentActivity(){
+        Activity currActivity = myApplication.getCurrentActivity();
+        if (this.equals(currActivity))
+            myApplication.setCurrentActivity(null);
     }
 
     /**
@@ -210,6 +225,7 @@ public class ExerciseActivity extends WearableActivity  {
     @Override
     protected void onDestroy() {
         exerciseListener.unregister();
+        clearCurrentActivity();
         finish();
         super.onDestroy();
     }

@@ -6,13 +6,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.support.wearable.view.WearableListView;
-import android.util.Log;
 import android.view.View;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -23,10 +21,10 @@ import com.atbsg.atbsg.R;
 import com.atbsg.atbsg.games.CalibrationActivity;
 import com.atbsg.atbsg.games.PhoneGameActivity;
 import com.atbsg.atbsg.games.ExerciseActivity;
+import com.atbsg.atbsg.how.MyApplication;
 import com.atbsg.atbsg.how.TextActivity;
 import com.atbsg.atbsg.logging.CloudLogger;
 import com.atbsg.atbsg.logging.Logger;
-import com.atbsg.atbsg.logging.UserSessionData;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,14 +42,16 @@ public class ListActivity extends Activity implements WearableListView.ClickList
     public static Logger logger;
     private static final String START_SPEECH = "Welcome to the around the body stroke recovery game. Your starting " +
             "options are: how to play, game modes, my progress and settings";
-    boolean gameMenu = false;
-    boolean scoreMenu = false;
-    boolean settingsMenu = false;
-    boolean viewUsersMenu = false;
-    boolean deleteUsersMenu = false;
+    private boolean gameMenu = false;
+    private boolean scoreMenu = false;
+    private boolean settingsMenu = false;
+    private boolean viewUsersMenu = false;
+    private boolean deleteUsersMenu = false;
     public CloudLogger cloudLogger;
-    private int mBindFlag;
-    private Messenger mServiceMessenger;
+    private int bindFlag;
+    private Messenger voiceBinder;
+    protected MyApplication myApplication;
+    public static String screenName = "main";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,9 +62,11 @@ public class ListActivity extends Activity implements WearableListView.ClickList
         Bundle b=this.getIntent().getExtras();
 
         cloudLogger = new CloudLogger(this);
+        cloudLogger.initApi();
+        myApplication = (MyApplication)this.getApplicationContext();
         if(b!=null){
             String[] array=b.getStringArray("listItems");
-            boolean voiced = b.getBoolean("voiced");
+
             boolean delete = b.getBoolean("delete");
             elements = array;
             if(elements[0].startsWith("Easy High")){
@@ -73,17 +75,16 @@ public class ListActivity extends Activity implements WearableListView.ClickList
                 gameMenu = true;
             }else if(elements[0].startsWith("Your")){
                 settingsMenu = true;
+                cloudLogger.initApi();
             }else if (delete){
                 deleteUsersMenu = true;
             }
             else{
                 viewUsersMenu = true;
             }
-            if(voiced) {
-                voiceDelayThenFinish();
-            }
+            setScreenName();
         }else{
-            if(logger.getUniqueId().equals("")){
+            if(logger.getUniqueId().equals("")){ //If first time user has opened after install
                 String uniqueId = logger.generateUnique(6);
                 logger.saveUserArray(uniqueId);
                 logger.setCurrentUser(uniqueId);
@@ -92,10 +93,7 @@ public class ListActivity extends Activity implements WearableListView.ClickList
             }
             Intent service = new Intent(ListActivity.this, com.atbsg.atbsg.menu.VoiceService.class);
             ListActivity.this.startService(service);
-            mBindFlag = Context.BIND_ABOVE_CLIENT;
-            cloudLogger = new CloudLogger(this);
-            cloudLogger.initApi();
-            cloudLogger.sendScoreToCloud(START_SPEECH);
+            bindFlag = Context.BIND_ABOVE_CLIENT;
         }
 
         WearableListView listView =
@@ -119,7 +117,6 @@ public class ListActivity extends Activity implements WearableListView.ClickList
      */
     public void startHowActivity() {
         Intent intent = new Intent(this, TextActivity.class);
-        cloudLogger.sendScoreToCloud("To play this game, strap the watch firmly on your wrist and follow the directions on screen. You can swipe right to move back a screen.");
         startActivity(intent);
     }
 
@@ -127,9 +124,6 @@ public class ListActivity extends Activity implements WearableListView.ClickList
      * Start the show unique I.D. screen
      */
     public void startSettingsActivity() {
-        /*logger.addToHashMap(Integer.toString(3), "fkefe");
-        logger.addToHashMap(Integer.toString(1), "ddasfas");
-        logger.sendText();*/
         Bundle b = new Bundle();
         b.putStringArray("listItems", new String[]{"Your Unique I.D.", "Change User", "Create New User", "Delete User"});
         Intent intent = new Intent(this, ListActivity.class);
@@ -137,6 +131,9 @@ public class ListActivity extends Activity implements WearableListView.ClickList
         startActivity(intent);
     }
 
+    /**
+     * Start the change user screen
+     */
     public void startChangeUserActivity() {
         Bundle b = new Bundle();
         b.putStringArray("listItems", logger.loadUserArray());
@@ -145,6 +142,9 @@ public class ListActivity extends Activity implements WearableListView.ClickList
         startActivity(intent);
     }
 
+    /**
+     * Start the delete user screen
+     */
     public void startDeleteUserActivity() {
         Bundle b = new Bundle();
         b.putStringArray("listItems", logger.loadUserArray());
@@ -154,12 +154,14 @@ public class ListActivity extends Activity implements WearableListView.ClickList
         startActivity(intent);
     }
 
+    /**
+     * Start the view unique I.D. screen
+     */
     public void viewUniqueActivity(){
         Bundle b=new Bundle();
         b.putBoolean("unique", true);
         Intent intent = new Intent(this, TextActivity.class);
         intent.putExtras(b);
-        cloudLogger.sendScoreToCloud("Your unique I.D. is " + logger.getUniqueId() + ". Your physiotherapist can view your progress via the web service using this I.D.");
         startActivity(intent);
     }
 
@@ -174,12 +176,6 @@ public class ListActivity extends Activity implements WearableListView.ClickList
                 "Last Medium Score: " + logger.getLastMediumScore(),
                 "Hard High Score: " + logger.getHardScore(),
                 "Last Hard Score: " + logger.getLastHardScore()});
-        cloudLogger.sendScoreToCloud("Your easy High Score is: " + logger.getEasyScore() +
-                ", Your Last Easy Score is : " + logger.getLastEasyScore() +
-                ", Your Medium High Score is: " + logger.getMediumScore() +
-                ", Your Last Medium Score is: " + logger.getLastMediumScore() +
-                ", Your Hard High Score is : " + logger.getHardScore() +
-                ", Your Last Hard Score is : " + logger.getLastHardScore());
         Intent intent = new Intent(this, ListActivity.class);
         intent.putExtras(b);
         startActivity(intent);
@@ -199,9 +195,18 @@ public class ListActivity extends Activity implements WearableListView.ClickList
      * Start the game on the connected phone.
      */
     public void startPhoneGameActivity() {
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         Intent i = new Intent(this, PhoneGameActivity.class);
+        cloudLogger.sendToPhone("Please look at your phone to see this game!");
         startActivity(i);
+    }
+
+    /**
+     *Clear the current activity reference
+     */
+    private void clearCurrentActivity(){
+        Activity currActivity = myApplication.getCurrentActivity();
+        if (this.equals(currActivity))
+            myApplication.setCurrentActivity(null);
     }
 
     /**
@@ -209,11 +214,25 @@ public class ListActivity extends Activity implements WearableListView.ClickList
      * @param speech
      */
     public void speakOnPhone(String speech){
-        cloudLogger.sendScoreToCloud(speech);
+        cloudLogger.sendToPhone(speech);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setScreenName();
+        myApplication.setCurrentActivity(this);
+    }
+
+    @Override
+    protected void onPause() {
+        clearCurrentActivity();
+        super.onPause();
     }
 
     @Override
     protected void onDestroy() {
+        clearCurrentActivity();
         if(!gameMenu && !scoreMenu && !viewUsersMenu && !settingsMenu && !deleteUsersMenu) {
             android.os.Process.killProcess(android.os.Process.myPid());
             System.exit(0);
@@ -229,7 +248,7 @@ public class ListActivity extends Activity implements WearableListView.ClickList
     public void onClick(WearableListView.ViewHolder viewHolder) {
 
         Integer tag = (Integer) viewHolder.itemView.getTag();
-        if(!gameMenu && !scoreMenu && !viewUsersMenu && !settingsMenu && !deleteUsersMenu) {
+        if(isMainMenu()) {
             if (tag == 0) {
                 startHowActivity();
             }
@@ -246,20 +265,24 @@ public class ListActivity extends Activity implements WearableListView.ClickList
                 startPhoneGameActivity();
             }
         }
-        if(gameMenu && !scoreMenu && !viewUsersMenu && !settingsMenu && !deleteUsersMenu) {
+        if(isGameMenu()) {
             if (tag == 0) {
+                cloudLogger.sendToPhone("2EASY");
                 startGameModeActivity(1000, 2000);
             }
             if (tag == 1) {
+                cloudLogger.sendToPhone("2MEDIUM");
                 startGameModeActivity(2000, 4000);
             }
             if (tag == 2) {
+                cloudLogger.sendToPhone("2HARD");
                 startGameModeActivity(4000, 8000);
             }
         }
-        if(settingsMenu && !scoreMenu && !gameMenu && !viewUsersMenu && !deleteUsersMenu) {
+        if(isSettingsMenu()) {
             if (tag == 0) {
                 viewUniqueActivity();
+                screenName = "unique";
             }
             if (tag == 1) {
                 startChangeUserActivity();
@@ -272,12 +295,12 @@ public class ListActivity extends Activity implements WearableListView.ClickList
                 startDeleteUserActivity();
             }
         }
-        if(viewUsersMenu && !settingsMenu && !scoreMenu && !gameMenu && !deleteUsersMenu) {
+        if(isViewUsersMenu()) {
             String[] array = logger.loadUserArray();
             logger.setCurrentUser(array[tag]);
             finish();
         }
-        if(deleteUsersMenu && !viewUsersMenu && !settingsMenu && !scoreMenu && !gameMenu) {
+        if(isDeleteUsersMenu()) {
             int i = tag;
             ArrayList<String> userList = new ArrayList<String>(Arrays.asList(logger.loadUserArray()));
             if(userList.size() > 1) {
@@ -289,15 +312,65 @@ public class ListActivity extends Activity implements WearableListView.ClickList
         }
     }
 
-    public void voiceDelayThenFinish(){
-        Handler handler = new Handler();
-        Runnable r=new Runnable() {
-            @Override
-            public void run() {
-                finish();
-            }
-        };
-        handler.postDelayed(r, 10000);
+    /**
+     * Quick check to see if screen is main menu
+     * @return boolean
+     */
+    private boolean isMainMenu(){
+        return !gameMenu && !scoreMenu && !viewUsersMenu && !settingsMenu && !deleteUsersMenu;
+    }
+
+    /**
+     * Quick check to see if screen is game menu
+     * @return boolean
+     */
+    private boolean isGameMenu() {
+        return gameMenu && !scoreMenu && !viewUsersMenu && !settingsMenu && !deleteUsersMenu;
+    }
+
+    /**
+     * Quick check to see if screen is settings menu
+     * @return boolean
+     */
+    private boolean isSettingsMenu(){
+        return settingsMenu && !scoreMenu && !gameMenu && !viewUsersMenu && !deleteUsersMenu;
+    }
+
+    /**
+     * Quick check to see if screen is view users menu
+     * @return boolean
+     */
+    private boolean isViewUsersMenu(){
+        return viewUsersMenu && !settingsMenu && !scoreMenu && !gameMenu && !deleteUsersMenu;
+    }
+
+    /**
+     * Quick check to see if screen is delete users menu
+     * @return boolean
+     */
+    private boolean isDeleteUsersMenu(){
+        return deleteUsersMenu && !viewUsersMenu && !settingsMenu && !scoreMenu && !gameMenu;
+    }
+
+    /**
+     * Quick check to see if screen is delete users menu
+     * @return boolean
+     */
+    private boolean isProgressMenu(){
+        return scoreMenu && !deleteUsersMenu && !viewUsersMenu && !settingsMenu && !gameMenu;
+    }
+
+    /**
+     * Set screen name to be accessed by voice service
+     * for informing the user of their options.
+     */
+    public void setScreenName(){
+        if(isMainMenu()){screenName = "main";}
+        if(isGameMenu()){screenName = "game";}
+        if(isSettingsMenu()){screenName = "settings";}
+        if(isViewUsersMenu()){screenName = "view";}
+        if(isDeleteUsersMenu()){screenName = "delete";}
+        if(isProgressMenu()){screenName = "progress";}
     }
 
     @Override
@@ -352,7 +425,7 @@ public class ListActivity extends Activity implements WearableListView.ClickList
     {
         super.onStart();
 
-        bindService(new Intent(this, com.atbsg.atbsg.menu.VoiceService.class), mServiceConnection, mBindFlag);
+        bindService(new Intent(this, com.atbsg.atbsg.menu.VoiceService.class), mServiceConnection, bindFlag);
     }
 
     @Override
@@ -369,13 +442,13 @@ public class ListActivity extends Activity implements WearableListView.ClickList
         @Override
         public void onServiceConnected(ComponentName name, IBinder service)
         {
-            mServiceMessenger = new Messenger(service);
+            voiceBinder = new Messenger(service);
             Message msg = new Message();
             msg.what = com.atbsg.atbsg.menu.VoiceService.MSG_RECOGNIZER_START_LISTENING;
 
             try
             {
-                mServiceMessenger.send(msg);
+                voiceBinder.send(msg);
             }
             catch (RemoteException e)
             {

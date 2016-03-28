@@ -125,7 +125,6 @@ public class GameActivity extends AndroidApplication implements PhoneGameInterfa
 	@Override
 	public void speak(String speech){
 		try {
-			System.out.println("SPEAKING " + speech);
 			if(!logger.getMuted()) {
 				t1.speak(speech, TextToSpeech.QUEUE_FLUSH, null);
 			}
@@ -158,12 +157,13 @@ public class GameActivity extends AndroidApplication implements PhoneGameInterfa
 	 */
 	@Override
 	public void setCurrentGameScore(int score) {
+		logger.setGameLastScore(score);
 		currentGameScore = score;
 	}
 
 	@Override
 	protected void onDestroy () {
-		new ScorePoster().execute(MainActivity.getUserId(), Integer.toString(currentGameScore), new Date().toString(), "Game");
+		new ScorePoster().execute(MainActivity.getUserId(), Integer.toString(currentGameScore), "Circles Game"); //Post the Circles Game score to MySQL database.
 		unregisterReceiver(closeGame);
 		super.onDestroy();
 	}
@@ -175,7 +175,6 @@ public class GameActivity extends AndroidApplication implements PhoneGameInterfa
 	private final BroadcastReceiver closeGame = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			System.out.println("BROADCAST");
 			finish();
 		}
 	};

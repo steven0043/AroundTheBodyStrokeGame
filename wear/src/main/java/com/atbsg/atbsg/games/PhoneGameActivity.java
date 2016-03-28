@@ -1,19 +1,14 @@
 package com.atbsg.atbsg.games;
 
+import android.app.Activity;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.support.wearable.activity.WearableActivity;
-import android.support.wearable.view.BoxInsetLayout;
-import android.view.View;
 import android.view.WindowManager;
-import android.widget.TextView;
 
 import com.atbsg.atbsg.R;
+import com.atbsg.atbsg.how.MyApplication;
 import com.atbsg.atbsg.logging.CloudLogger;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 
 /**
  * Created by Steven on 07/02/2016.
@@ -22,6 +17,7 @@ public class PhoneGameActivity extends WearableActivity {
 
     public CloudLogger cloudLogger;
     private PhoneGameListener sensorListener;
+    protected MyApplication myApplication;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +26,7 @@ public class PhoneGameActivity extends WearableActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_phone_game);
         setAmbientEnabled();
+        myApplication = (MyApplication)this.getApplicationContext();
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         runOnUiThread(new Runnable() {
             public void run() {
@@ -70,14 +67,36 @@ public class PhoneGameActivity extends WearableActivity {
 
     }
 
+    @Override
+     protected void onResume() {
+        super.onResume();
+        myApplication.setCurrentActivity(this);
+    }
+
+    @Override
+    protected void onPause() {
+        clearCurrentActivity();
+        super.onPause();
+    }
+
+    /**
+     *Clear the current activity reference
+     */
+    private void clearCurrentActivity(){
+        Activity currActivity = myApplication.getCurrentActivity();
+        if (this.equals(currActivity))
+            myApplication.setCurrentActivity(null);
+    }
+
     /**
      * Activity onDestroy, unregisters the sensor listener
      */
     @Override
     protected void onDestroy() {
         //Tells the phone to exit the circle game.
-        cloudLogger.sendScoreToCloud("4");
+        cloudLogger.sendToPhone("4");
         sensorListener.unregister();
+        clearCurrentActivity();
         finish();
         super.onDestroy();
     }

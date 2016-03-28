@@ -1,27 +1,29 @@
 package com.atbsg.atbsg.how;
 
+import android.app.Activity;
 import android.app.Application;
-import android.content.Context;
-
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.wearable.NodeApi;
-import com.google.android.gms.wearable.Wearable;
-
-import com.google.android.gms.wearable.Node;
-
-import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Steven on 25/01/2016.
+ *
+ * Application class, helps keep track of current activities
+ * for use in the voice service, to end an activity based on
+ * user speech.
  */
 public class MyApplication extends Application {
-
+    private Activity currentActivity = null;
 
     @Override
     public void onCreate() {
         super.onCreate();
     }
 
+    public Activity getCurrentActivity(){
+        return currentActivity;
+    }
+
+    public void setCurrentActivity(Activity mCurrentActivity){
+        this.currentActivity = mCurrentActivity;
+    }
 
 }

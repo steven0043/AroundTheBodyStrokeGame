@@ -1,6 +1,7 @@
 package com.atbsg.atbsg.games;
 
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.hardware.SensorManager;
@@ -13,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.atbsg.atbsg.R;
+import com.atbsg.atbsg.how.MyApplication;
 import com.atbsg.atbsg.logging.CloudLogger;
 import com.atbsg.atbsg.menu.ListActivity;
 
@@ -33,6 +35,7 @@ public class CalibrationActivity extends WearableActivity {
     private boolean spoken = false;
     public CalibrationListener sensorListener;
     CloudLogger cloudLogger;
+    protected MyApplication myApplication;
 
     public CalibrationActivity(){
 
@@ -46,7 +49,7 @@ public class CalibrationActivity extends WearableActivity {
         cloudLogger.initApi();
         setAmbientEnabled();
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        System.out.println("Adding Calibration" );
+        myApplication = (MyApplication)this.getApplicationContext();
         final WatchViewStub stub = (WatchViewStub) findViewById(R.id.watch_view_stub);
         stub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener() {
             @Override
@@ -78,18 +81,18 @@ public class CalibrationActivity extends WearableActivity {
      */
     public void setImageView(boolean calibrated) {
         final boolean calibratedd = calibrated;
-        runOnUiThread(new Runnable(){
+        runOnUiThread(new Runnable() {
             @Override
-            public void run(){
-                if(calibratedd && textBool){
+            public void run() {
+                if (calibratedd && textBool) {
                     imageView.setImageResource(R.mipmap.tick);
                     calibrateClick = true;
                     setmTextView("Great! Hold it there!");
-                    if(!spoken) {
-                        cloudLogger.sendScoreToCloud("Great! Hold it there for 2 more seconds!");
+                    if (!spoken) {
+                        cloudLogger.sendToPhone("Great! Hold it there!");
                         spoken = true;
                     }
-                }else if (!calibratedd && textBool) {
+                } else if (!calibratedd && textBool) {
                     setmTextView("Before we start, look straight ahead. Then please make sure the watch face is parallel to your own face");
                     imageView.setImageResource(R.mipmap.cross);
                     calibrateClick = false;
@@ -105,10 +108,7 @@ public class CalibrationActivity extends WearableActivity {
     public void loadGame(){
         imageView.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                System.out.println("Clicked");
                 if (calibrateClick) {
-                    //sensorListener.unregister();
-                    System.out.println("Clicked tick");
                     Intent intent = new Intent(CalibrationActivity.this, ExerciseActivity.class);
                     startActivity(intent);
                     finish();
@@ -126,7 +126,7 @@ public class CalibrationActivity extends WearableActivity {
             sensorListener.unregister();
             Bundle b=new Bundle();
             b.putStringArray("listItems", new String[]{"Easy", "Medium", "Hard"});
-            cloudLogger.sendScoreToCloud("Your game options are: easy, medium and hard");
+            cloudLogger.sendToPhone("Your game options are: easy, medium and hard");
             Intent intent = new Intent(this, ListActivity.class);
             intent.putExtras(b);
             startActivity(intent);
@@ -137,11 +137,22 @@ public class CalibrationActivity extends WearableActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        myApplication.setCurrentActivity(this);
     }
 
     @Override
     protected void onPause() {
+        clearCurrentActivity();
         super.onPause();
+    }
+
+    /**
+     *Clear the current acitivity reference
+     */
+    private void clearCurrentActivity(){
+        Activity currActivity = myApplication.getCurrentActivity();
+        if (this.equals(currActivity))
+            myApplication.setCurrentActivity(null);
     }
 
     /**
@@ -150,6 +161,7 @@ public class CalibrationActivity extends WearableActivity {
     @Override
     protected void onDestroy() {
         sensorListener.unregister();
+        clearCurrentActivity();
         finish();
         super.onDestroy();
     }

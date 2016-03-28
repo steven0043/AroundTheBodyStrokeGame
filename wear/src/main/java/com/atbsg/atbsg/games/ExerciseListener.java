@@ -50,6 +50,7 @@ public class ExerciseListener implements SensorEventListener {
         this.horizontalMax = horizontalMax;
         this.verticalMax = verticalMax;
         logger = new Logger(currentActivity);
+        logger.initialiseCommunication();
         v = (Vibrator) currentActivity.getSystemService(Context.VIBRATOR_SERVICE);
         mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_UI);
     }

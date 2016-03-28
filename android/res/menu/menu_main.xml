@@ -5,6 +5,9 @@
         android:titleCondensed="Mute"
         android:title="Mute"
         android:checkable="true"/>
+    <item android:id="@+id/info"
+        android:titleCondensed="App Info"
+        android:title="App Info"/>
     <item android:id="@+id/game"
         android:titleCondensed="Play Circles Game"
         android:title="Play Circles Game"/>

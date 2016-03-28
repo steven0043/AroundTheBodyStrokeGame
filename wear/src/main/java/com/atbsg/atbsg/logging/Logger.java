@@ -4,8 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.atbsg.atbsg.logging.CloudLogger;
-
 import java.util.Random;
 
 /**
@@ -28,10 +26,15 @@ public class Logger {
     final static String openKey = "openedTimes";
     final static String userArrayKey = "userArray";
     final static String currentUserKey = "currentUser";
+    private Activity acc;
 
     public Logger(Activity acc) {
         prefs = acc.getSharedPreferences(
                 "com.atbsg.atbsg", Context.MODE_PRIVATE);
+        this.acc = acc;
+    }
+
+    public void initialiseCommunication(){
         cloudLogger = new CloudLogger(acc);
         cloudLogger.initApi();
     }
@@ -42,7 +45,6 @@ public class Logger {
 
     public void addToUserData(String fileSend){
         String fileToSend =  prefs.getString("fileData", "") + fileSend;
-        //System.out.println(fileToSend);
         prefs.edit().putString("fileData", fileToSend).apply();
     }
     /**
@@ -151,7 +153,7 @@ public class Logger {
      * @param easyScore
      */
     public void setLastEasyScore(int easyScore){
-        cloudLogger.sendScoreToCloud("easy " + easyScore + " " + this.getUniqueId());
+        cloudLogger.sendToPhone("0easy " + easyScore + " " + this.getUniqueId());
         prefs.edit().putInt(lastEasyKey+this.getUniqueId(), easyScore).apply();
     }
 
@@ -161,7 +163,7 @@ public class Logger {
      * @param mediumScore
      */
     public void setLastMediumScore(int mediumScore){
-        cloudLogger.sendScoreToCloud("medium " + mediumScore + " " + this.getUniqueId());
+        cloudLogger.sendToPhone("0medium " + mediumScore + " " + this.getUniqueId());
         prefs.edit().putInt(lastMediumKey+this.getUniqueId(), mediumScore).apply();
     }
 
@@ -171,7 +173,7 @@ public class Logger {
      * @param hardScore
      */
     public void setLastHardScore(int hardScore){
-        cloudLogger.sendScoreToCloud("hard " + hardScore + " " + this.getUniqueId());
+        cloudLogger.sendToPhone("0hard " + hardScore + " " + this.getUniqueId());
         prefs.edit().putInt(lastHardKey+this.getUniqueId(), hardScore).apply();
     }
 

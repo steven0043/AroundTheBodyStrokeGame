@@ -21,7 +21,8 @@ public class TextActivity extends Activity {
     private TextView mTextView;
     private boolean uniqueId = false;
     private Logger logger;
-    CloudLogger cloudLogger;
+    public CloudLogger cloudLogger;
+    protected MyApplication myApplication;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,14 +30,14 @@ public class TextActivity extends Activity {
         setContentView(R.layout.activity_how);
         logger = new Logger(this);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        myApplication = (MyApplication)this.getApplicationContext();
 
+        cloudLogger = new CloudLogger(this);
+        cloudLogger.initApi();
 
         Bundle b=this.getIntent().getExtras();
         if(b!=null){
             uniqueId = (b.getBoolean("unique"));
-        }else{
-            cloudLogger = new CloudLogger(this);
-            cloudLogger.initApi();
         }
 
         final WatchViewStub stub = (WatchViewStub) findViewById(R.id.watch_view_stub);
@@ -49,5 +50,35 @@ public class TextActivity extends Activity {
                 }
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        myApplication.setCurrentActivity(this);
+    }
+
+    @Override
+    protected void onPause() {
+        clearCurrentActivity();
+        super.onPause();
+    }
+
+    /**
+     *Clear the current activity reference
+     */
+    private void clearCurrentActivity(){
+        Activity currActivity = myApplication.getCurrentActivity();
+        if (this.equals(currActivity))
+            myApplication.setCurrentActivity(null);
+    }
+
+    /**
+     * Activity onDestroy, unregisters the sensor listener
+     */
+    @Override
+    protected void onDestroy() {
+        clearCurrentActivity();
+        super.onDestroy();
     }
 }
