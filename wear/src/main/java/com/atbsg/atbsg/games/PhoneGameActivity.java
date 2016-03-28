@@ -12,6 +12,8 @@ import com.atbsg.atbsg.logging.CloudLogger;
 
 /**
  * Created by Steven on 07/02/2016.
+ *
+ * Activity used on the watch during the playing of the circles game on the phone.
  */
 public class PhoneGameActivity extends WearableActivity {
 

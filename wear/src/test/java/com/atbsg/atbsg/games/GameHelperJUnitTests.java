@@ -26,13 +26,13 @@ public class GameHelperJUnitTests {
     }
 
     /**
-     * JUnit test for checking the getNextDirections() method
+     * JUnit test for checking the getNextDirection() method
      * returns the expected next game direction.
      */
     @Test
     public void testNextDirection() {
         String nextDirection = "UP";
-        assertTrue(gameHelper.getNextDirections().equals(nextDirection));
+        assertTrue(gameHelper.getNextDirection().equals(nextDirection));
     }
 
     /**

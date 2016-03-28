@@ -40,8 +40,6 @@ public class ListActivity extends Activity implements WearableListView.ClickList
 
     String[] elements = {"How to Play", "Game Modes", "My Progress", "Settings","Play Game on Phone"};
     public static Logger logger;
-    private static final String START_SPEECH = "Welcome to the around the body stroke recovery game. Your starting " +
-            "options are: how to play, game modes, my progress and settings";
     private boolean gameMenu = false;
     private boolean scoreMenu = false;
     private boolean settingsMenu = false;
@@ -64,7 +62,8 @@ public class ListActivity extends Activity implements WearableListView.ClickList
         cloudLogger = new CloudLogger(this);
         cloudLogger.initApi();
         myApplication = (MyApplication)this.getApplicationContext();
-        if(b!=null){
+
+        if(b!=null){//If != null then it's not the main screen, from the first item's name we can tell the screen type/
             String[] array=b.getStringArray("listItems");
 
             boolean delete = b.getBoolean("delete");
@@ -96,6 +95,7 @@ public class ListActivity extends Activity implements WearableListView.ClickList
             bindFlag = Context.BIND_ABOVE_CLIENT;
         }
 
+        //Make list view with array items
         WearableListView listView =
                 (WearableListView) findViewById(R.id.wearable_list);
 
@@ -241,7 +241,7 @@ public class ListActivity extends Activity implements WearableListView.ClickList
     }
 
     /**
-     * Check which list item has been clicked.
+     * Check which list item has been clicked depending on the current screen.
      * @param viewHolder
      */
     @Override
@@ -382,12 +382,12 @@ public class ListActivity extends Activity implements WearableListView.ClickList
      * Custom adapter for the list.
      */
     private static final class Adapter extends WearableListView.Adapter {
-        private String[] mDataset;
+        private String[] listItems;
         private final LayoutInflater mInflater;
 
-        public Adapter(Context context, String[] dataset, boolean scoreMenu) {
+        public Adapter(Context context, String[] items, boolean scoreMenu) {
             mInflater = LayoutInflater.from(context);
-            mDataset = dataset;
+            listItems = items;
         }
 
 
@@ -410,13 +410,13 @@ public class ListActivity extends Activity implements WearableListView.ClickList
                                      int position) {
             ItemViewHolder itemHolder = (ItemViewHolder) holder;
             TextView view = itemHolder.textView;
-            view.setText(mDataset[position]);
+            view.setText(listItems[position]);
             holder.itemView.setTag(position);
         }
 
         @Override
         public int getItemCount() {
-            return mDataset.length;
+            return listItems.length;
         }
     }
 
@@ -425,6 +425,9 @@ public class ListActivity extends Activity implements WearableListView.ClickList
     {
         super.onStart();
 
+        /*Bind the voice service to this activity, as it's the first screen this activity will
+          always be present until exit.
+         */
         bindService(new Intent(this, com.atbsg.atbsg.menu.VoiceService.class), mServiceConnection, bindFlag);
     }
 

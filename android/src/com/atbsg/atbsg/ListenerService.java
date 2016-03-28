@@ -89,7 +89,7 @@ public class ListenerService extends WearableListenerService {
                 MainActivity.setUserId(userId);
                 MainActivity.playGame();
             }
-            else{
+            else{ //If it does not start with a key, then it's to be spoke via the phone
                 speak(messageEvent.getPath());
             }
         }catch (Exception e){

@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity{
     private boolean ethics = false;
     private static boolean maximumsSet = false;
     private static String userId = "no id";
-    static TextToSpeech t1;
+    static TextToSpeech textToSpeech;
     private final String webService = "https://devweb2014.cis.strath.ac.uk/~emb12161/WAD/ATBSG/ATBSG.php";
 
     @Override
@@ -51,22 +51,22 @@ public class MainActivity extends AppCompatActivity{
         setContentView(R.layout.activity_main);
 
         logger = new Logger(this);
-        mContext = this;
+        mContext = this; //Keep context variable in order to start Circles Game from Listener Service
 
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        try {
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON); //Keep screen on, so it doesn't dim when not touched.
 
-        }catch (Exception e){
-
-        }
-        t1=new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+        textToSpeech =new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
                 if(status != TextToSpeech.ERROR) {
-                    t1.setLanguage(Locale.UK);
+                    textToSpeech.setLanguage(Locale.UK);
                 }
             }
-        });
+        }); //Initialise textToSpeech to English(UK)
+
+        /**
+         * Initialise text views and progress bars based on their XML.
+         */
         mTextView = (TextView) findViewById(R.id.text);
         mTextViewDifficulty = (TextView) findViewById(R.id.textDifficulty);
         mProgress = (ProgressBar) findViewById(R.id.progressBar);
@@ -215,9 +215,8 @@ public class MainActivity extends AppCompatActivity{
      */
     public static void speak(String speech){
         try {
-            System.out.println("SPEAKING " + speech);
             if(!logger.getMuted()) {
-                t1.speak(speech, TextToSpeech.QUEUE_FLUSH, null);
+                textToSpeech.speak(speech, TextToSpeech.QUEUE_FLUSH, null);
             }
         }catch (Exception e){
 

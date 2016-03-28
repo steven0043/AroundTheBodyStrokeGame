@@ -36,6 +36,7 @@ public class WearableList extends LinearLayout
                         int defStyle) {
         super(context, attrs, defStyle);
 
+        //Sets the colours of the selected and non selected circles on each list
         listItemUnselectedColour = getResources().getColor(R.color.grey);
         listItemSelectedColour = getResources().getColor(R.color.green);
     }
@@ -50,12 +51,12 @@ public class WearableList extends LinearLayout
     @Override
     public void onCenterPosition(boolean animate) {
         listItem.setAlpha(1f);
-        ((GradientDrawable) listCircle.getDrawable()).setColor(listItemSelectedColour);
+        ((GradientDrawable) listCircle.getDrawable()).setColor(listItemSelectedColour); //Set colour when list item is centered
     }
 
     @Override
     public void onNonCenterPosition(boolean animate) {
-        ((GradientDrawable) listCircle.getDrawable()).setColor(listItemUnselectedColour);
+        ((GradientDrawable) listCircle.getDrawable()).setColor(listItemUnselectedColour); //Set colour when list item is not centered
         listItem.setAlpha(.25f);
     }
 }

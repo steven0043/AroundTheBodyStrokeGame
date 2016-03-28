@@ -19,16 +19,14 @@ import android.view.WindowManager;
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 
-import java.util.Date;
 import java.util.Locale;
 
 public class GameActivity extends AndroidApplication implements PhoneGameInterface {
 	static int vertical, horizontal;
 	WatchCommunicator watchCommunicator;
-	TextToSpeech t1;
+	TextToSpeech textToSpeech;
 	Logger logger;
 	private int currentGameScore = 0;
-	private String userId = "no id";
 
 	public GameActivity(){
 
@@ -63,11 +61,11 @@ public class GameActivity extends AndroidApplication implements PhoneGameInterfa
 		watchCommunicator = new WatchCommunicator(this);
 		watchCommunicator.initApi();
 		logger = new Logger(this);
-		t1=new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+		textToSpeech =new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
 			@Override
 			public void onInit(int status) {
 				if(status != TextToSpeech.ERROR) {
-					t1.setLanguage(Locale.UK);
+					textToSpeech.setLanguage(Locale.UK);
 				}
 			}
 		});
@@ -126,7 +124,7 @@ public class GameActivity extends AndroidApplication implements PhoneGameInterfa
 	public void speak(String speech){
 		try {
 			if(!logger.getMuted()) {
-				t1.speak(speech, TextToSpeech.QUEUE_FLUSH, null);
+				textToSpeech.speak(speech, TextToSpeech.QUEUE_FLUSH, null);
 			}
 		}catch (Exception e){
 

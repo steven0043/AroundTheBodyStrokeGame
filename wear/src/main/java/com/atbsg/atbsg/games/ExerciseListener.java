@@ -64,14 +64,17 @@ public class ExerciseListener implements SensorEventListener {
     public void onSensorChanged(SensorEvent event) {
 
         long curTime = System.currentTimeMillis();
-        if((curTime - lastUpdate) > 10) {
+        if((curTime - lastUpdate) > 10) { //Don't want to update too frequently, update every 10ms
 
-            if(event.sensor.getType()==Sensor.TYPE_ACCELEROMETER) {
-                removeGravity(event);
+            if(event.sensor.getType()==Sensor.TYPE_ACCELEROMETER) {//We're only getting accelerometer data
+                removeGravity(event); //Remove gravity from values
 
-                addToAverages();
+                addToAverages(); //Add current values to appropriate average list
                 //collectUserData(); was used during user evaluation to collect data.
 
+                /*
+                    Check if we are detected to be moving in a direction, apply appropriate calculation.
+                 */
                 if (goingUp()) {
                     applyUpWeighting();
                 } else if (goingDown()) {
@@ -82,9 +85,9 @@ public class ExerciseListener implements SensorEventListener {
                     applyLeftWeighting();
                 }
 
-                checkCompletedMovement();
+                checkCompletedMovement();//Check if we have fully completed a movement.
 
-                updateView();
+                updateView(); //Update the view
             }
             lastUpdate = curTime;
 
@@ -95,12 +98,13 @@ public class ExerciseListener implements SensorEventListener {
      * Update the phones view to reflect the progress values, direction and score.
      */
     private void updateView(){
-        currentActivity.addProgressToPhone("1"+score+ gameHelper.getNextDirections(), mProgressStatus);
+        currentActivity.addProgressToPhone("1"+score+ gameHelper.getNextDirection(), mProgressStatus);
         currentActivity.updateProgressBar(mProgressStatus);
     }
 
     /**
      * Isolate and remove gravity from the sensor events values.
+     * Included from Google sensor documentation: http://developer.android.com/reference/android/hardware/SensorEvent.html
      * @param event
      */
     private void removeGravity(SensorEvent event){
@@ -249,7 +253,7 @@ public class ExerciseListener implements SensorEventListener {
                 double horizontal = (double) horizontalMax;
                 percentage = ((status/horizontal) * 100.0);
             }
-            fileSend = fileSend + "\n" + gameHelper.getNextDirections() + "\nAccelerometer" + ": \nX[" + linear_acceleration[0] + "]" +
+            fileSend = fileSend + "\n" + gameHelper.getNextDirection() + "\nAccelerometer" + ": \nX[" + linear_acceleration[0] + "]" +
                     "\nY[" + linear_acceleration[1] + "]" + "\nZ[" + linear_acceleration[2] + "]"
                     + "\n\nMagnetometer" + ": \nX[" + magnetometerData.getX() + "]" +
                     "\nY[" + magnetometerData.getY() + "]" + "\nZ[" + magnetometerData.getZ() + "]"
@@ -279,15 +283,18 @@ public class ExerciseListener implements SensorEventListener {
                  */
                 if((score>15)&& (score % 5 == 0)){gameHelper.addRandomDirection();}
                 else{gameHelper.addDirection();}
-                gameHelper.remove();
-                score++;
-                changeVisibility(gameHelper.getNextDirections());
-                playSound(gameHelper.getNextDirections());
-                currentActivity.setmTextView(gameHelper.getGameDirections(), score);
+                gameHelper.remove();//Remove current direction
+                score++; //Increment score
+                changeVisibility(gameHelper.getNextDirection()); //If needed make a progress bar invisible/visible based on new direction
+                playSound(gameHelper.getNextDirection()); //Speak the new direction through the phone
+                currentActivity.setmTextView(gameHelper.getGameDirections(), score); //Update watch text view
                 moved = false;
                 direction = "";
-                this.adjustProgressValue();
-                v.vibrate(100);
+                this.adjustProgressValue(); //Adjust progress bar value based on new direction
+                v.vibrate(100); //Give a short vibration on the watch to let the user know they have completed a motion
+                /**
+                 * Change the high score if applicable based on the level we're playing
+                 */
                 if(score>logger.getEasyScore() && verticalMax == 2000){
                     logger.setEasyScore(score);
                 }

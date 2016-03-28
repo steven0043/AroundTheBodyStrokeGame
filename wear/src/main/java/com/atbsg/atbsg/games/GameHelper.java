@@ -38,7 +38,7 @@ public class GameHelper {
      * Get the next direction.
      * @return String
      */
-    public String getNextDirections() {
+    public String getNextDirection() {
         return gameDirections.get(0);
     }
 
@@ -84,7 +84,7 @@ public class GameHelper {
      * @return boolean
      */
     private boolean checkCurrent(String direction){
-        return direction.equals(getNextDirections());
+        return direction.equals(getNextDirection());
     }
 
     /**
@@ -134,7 +134,7 @@ public class GameHelper {
      * @return boolean
      */
     public boolean correctDirection(String userDirection){
-        return this.getNextDirections().equals(userDirection);
+        return this.getNextDirection().equals(userDirection);
     }
 
 }

@@ -3,7 +3,8 @@ package com.atbsg.atbsg.games;
 /**
  * Created by Steven on 07/02/2016.
  *
- * A sensor listener for the Circles Game
+ * A sensor listener for the Circles Game, much like that of the watch game except
+ * there is two way communication between watch and phone.
  */
 
 import android.hardware.Sensor;

@@ -80,11 +80,11 @@ public class CalibrationActivity extends WearableActivity {
      * @param calibrated
      */
     public void setImageView(boolean calibrated) {
-        final boolean calibratedd = calibrated;
+        final boolean isCalibrated = calibrated;
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (calibratedd && textBool) {
+                if (isCalibrated && textBool) {
                     imageView.setImageResource(R.mipmap.tick);
                     calibrateClick = true;
                     setmTextView("Great! Hold it there!");
@@ -92,7 +92,7 @@ public class CalibrationActivity extends WearableActivity {
                         cloudLogger.sendToPhone("Great! Hold it there!");
                         spoken = true;
                     }
-                } else if (!calibratedd && textBool) {
+                } else if (!isCalibrated && textBool) {
                     setmTextView("Before we start, look straight ahead. Then please make sure the watch face is parallel to your own face");
                     imageView.setImageResource(R.mipmap.cross);
                     calibrateClick = false;

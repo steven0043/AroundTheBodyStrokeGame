@@ -85,6 +85,9 @@ public class CloudLogger {
         }).start();
     }
 
+    /**
+     * Based on the activity or screen name that connected to the phone, play an appropriate message.
+     */
     public void playStartMessages(){
         if(contextClass.equals("ListActivity")){
             if(ListActivity.screenName.equals("main")){
