@@ -7,7 +7,6 @@ package com.atbsg.atbsg;
  */
 
 import android.content.Intent;
-import android.os.Message;
 
 import com.google.android.gms.wearable.DataEvent;
 import com.google.android.gms.wearable.DataEventBuffer;
@@ -21,7 +20,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Random;
 

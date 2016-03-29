@@ -12,8 +12,6 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 
-import com.atbsg.atbsg.games.*;
-
 
 public class CalibrationListener implements SensorEventListener {
 
